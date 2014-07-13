@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="*" >
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/high_price" />
+
+        <TextView
+            android:id="@+id/highPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+           android:text="@string/zeroes" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mean_price" />
+
+        <TextView
+            android:id="@+id/meanPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zeroes" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/low_price" />
+
+        <TextView
+            android:id="@+id/lowPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zeroes" />
+    </TableRow>
+    
+      <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/foilPriceWords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avg Foil Price" />
+
+        <TextView
+            android:id="@+id/foilPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zeroes" />
+    </TableRow>
+    
+
+    <Button android:id="@+id/toWebsite"
+        android:text="@string/to_website"
+        android:visibility="gone"/>
+    
+    
+</TableLayout>

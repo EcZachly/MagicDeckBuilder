@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lifeCounterLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/txtViewName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="NAME"
+        android:textStyle="bold" />
+
+    <com.zach.wilson.magic.app.helpers.VerticalTextView
+        android:id="@+id/verticalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/txtViewName"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:text="@string/LIFE"
+        android:textSize="10pt"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/plus1Life"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/txtViewName"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="40dp"
+        android:contentDescription="@string/U"
+        android:src="@drawable/heart" />
+
+    <TextView
+        android:id="@+id/txtViewLifeCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/txtViewName"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="15dp"
+        android:text="20"
+        android:textSize="26pt"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/txtViewLifePlus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtViewName"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="2dp"
+        android:layout_toRightOf="@+id/centerTextView"
+        android:background="@drawable/customborder"
+        android:text="+"
+        android:textColor="@color/green"
+        android:textSize="18pt"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/centerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible" >
+    </TextView>
+
+    <Button
+        android:id="@+id/txtViewLifeMinus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtViewName"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/centerTextView"
+        android:background="@drawable/customborder"
+        android:text="-"
+        android:textColor="@color/red"
+        android:textSize="18pt"
+        android:textStyle="bold" />
+
+    <View
+        android:id="@+id/red_line_spacer"
+        android:layout_width="fill_parent"
+        android:layout_height="4dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@android:color/white" />
+
+</RelativeLayout>

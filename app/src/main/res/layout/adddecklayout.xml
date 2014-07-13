@@ -1,0 +1,70 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal" >
+
+    <EditText
+        android:id="@+id/deckNameEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:hint="@string/deck_name" />
+
+    <EditText
+        android:id="@+id/addCardsEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/deckNameEditText"
+        android:layout_marginLeft="10dp"
+        android:hint="@string/add_cards" />
+
+    <TextView
+        android:id="@+id/txtcardsInDeck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/saveDeck"
+        android:layout_marginRight="10dp"
+        android:text="@string/cards_in_deck"
+        android:textSize="10pt" />
+
+    <ListView
+        android:id="@+id/potentialCards"
+        android:layout_width="125dp"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/cardsInDeck"
+        android:layout_marginBottom="100dp"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:id="@+id/numberOfCards"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/cardsInDeck"
+        android:text="@string/pound" />
+
+    <ListView
+        android:id="@+id/cardsInDeck"
+        android:layout_width="125dp"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/cardsInDeck"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="100dp" />
+
+    <Button
+        android:id="@+id/saveDeck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/save_deck" />
+
+</RelativeLayout>

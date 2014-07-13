@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="215dp"
+    android:background="@color/gray" >
+
+    <include
+        android:id="@+id/pricelayout"
+        layout="@layout/pricedialogcardindeck" />
+
+    <View
+        android:id="@+id/shortView"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/pricelayout"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/line_break_gray"
+        android:gravity="center" />
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/shortView"
+        android:weightSum="2" >
+
+        <ImageView
+            android:id="@+id/addCardToCart"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:src="@drawable/shopping_cart" />
+
+        <ImageView
+            android:id="@+id/shareCardAsText"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:src="@drawable/shareicon2" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/shortView2"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/layout1"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/line_break_gray"
+        android:gravity="center" />
+
+    <LinearLayout
+        android:id="@+id/layout2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/shortView2"
+        android:weightSum="2" >
+
+        <ImageView
+            android:id="@+id/cardInfo"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:src="@drawable/infoicon" />
+
+        <ImageView
+            android:id="@+id/addCardToDeck"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:src="@drawable/adddeckicon" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/shortView3"
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/line_break_gray"
+        android:gravity="center" />
+
+</RelativeLayout>
