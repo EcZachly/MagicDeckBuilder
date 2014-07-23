@@ -3,18 +3,45 @@ apply plugin: 'android'
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.3"
-
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        versionCode 1
-        versionName "1.0"
+        versionCode 24
+        versionName "6.3"
+    }
+    signingConfigs {
+        release {
+            // We can leave these in environment variables
+            storeFile file("C:\\Users\\Zach\\Desktop\\MagicAppKeystore\\MagicApp.apk")
+            keyAlias "magic app"
+
+            // These two lines make gradle believe that the signingConfigs
+            // section is complete. Without them, tasks like installRelease
+            // will not be available!
+            storePassword "notYourRealPassword"
+            keyPassword "notYourRealPassword"
+        }
     }
     buildTypes {
         release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
         }
+    }
+}
+
+task askForPasswords << {
+    // Must create String because System.readPassword() returns char[]
+    // (and assigning that below fails silently)
+    def storePw = new String(System.console().readPassword("Keystore password: "))
+    def keyPw  = new String(System.console().readPassword("Key password: "))
+
+    android.signingConfigs.release.storePassword = storePw
+    android.signingConfigs.release.keyPassword = keyPw
+}
+
+tasks.whenTaskAdded { theTask ->
+    if (theTask.name.equals("packageRelease")) {
+        theTask.dependsOn "askForPasswords"
     }
 }
 
@@ -22,5 +49,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.stanfy:gson-xml-java:0.1.+'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
-
+    compile 'com.jakewharton:butterknife:5.1.1'
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import retrofit.http.GET;
 import retrofit.http.Query;
 
@@ -34,7 +35,12 @@ public class TCGClient {
         }
     }
 
-    public static String formatSet(String set){
+
+    public static String formatSet(String set, String name){
+        if(name.equals("Mountain") || name.equals("Forest") || name.equals("Island") || name.equals("Plains") || name.equals("Swamp")){
+            set = "";
+        }
+
         if (set.startsWith("Magic 2")) {
             set = set.substring(0, 10);
             String temp = set.substring(set.length() - 2);

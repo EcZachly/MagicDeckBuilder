@@ -36,27 +36,27 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+
+//DONE INJECTING
 public class ArchenemyFragment extends Fragment {
-	JazzyViewPager pager;
+	@InjectView(R.id.planespager)JazzyViewPager pager;
 	ListView[] lists;
 	ImageAdapterPlaneschase[] adapters;
 	ArrayList<Card> cards;
 	int counter;
 	ProgressDialog dialog;
-
     PriceDialog pricing;
 	LayoutInflater inflater;
 	DisplayImageOptions options;
 	Context context;
 	Dialog priceDialog;
-
 	MagicAppSettings appState;
-	static String getPriceByID = "https://api.deckbrew.com/mtg/cards/";
-	String url = "https://api.deckbrew.com/mtg/cards?type=scheme";
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -65,8 +65,9 @@ public class ArchenemyFragment extends Fragment {
 		View v = inflater.inflate(R.layout.planesarchenemypagerlayout, null);
 		context = v.getContext();
 		appState = (MagicAppSettings)getActivity().getApplication();
-			
-		pager = (JazzyViewPager) v.findViewById(R.id.planespager);
+
+        ButterKnife.inject(this, v);
+
 		options = new DisplayImageOptions.Builder()
 				.showImageForEmptyUri(R.drawable.ic_launcher)
 				.showImageOnFail(R.drawable.ic_launcher)
@@ -108,7 +109,7 @@ public class ArchenemyFragment extends Fragment {
                                                    final int arg2, long arg3) {
                                 int counter = pager.getCurrentItem();
 
-                                TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet()) ,adapters[counter].getCard().getName(), new Callback<Products>() {
+                                TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()) ,adapters[counter].getCard().getName(), new Callback<Products>() {
                                     @Override
                                     public void success(Products products, Response response) {
                                         pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
@@ -174,7 +175,7 @@ public class ArchenemyFragment extends Fragment {
 					public void onItemClick(AdapterView<?> arg0, View arg1,
 							final int arg2, long arg3) {
 						counter = pager.getCurrentItem();
-                        TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet()), adapters[counter].getCard().getName(), new Callback<Products>() {
+                        TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()), adapters[counter].getCard().getName(), new Callback<Products>() {
                             @Override
                             public void success(Products products, Response response) {
                                 pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);

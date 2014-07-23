@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
@@ -45,16 +46,17 @@ public class CardCarouselFragment extends Fragment {
 	JazzyViewPager pager;
 	ArrayList<Card> cards;
 	Context context;
+    int currentItem;
 	LayoutInflater inflater;
 	DisplayImageOptions options;
-	boolean fromAdvSearch = false;
-	boolean fromSearch = false;
+	boolean fromAdvSearch;
+	boolean fromSearch;
 	MagicAppSettings appState;
 	ListView[] lists;
 	ImageListAdapter[] adapters;
 	int counter;
     PriceDialog pricing;
-
+    ProgressDialog loading;
 	public JazzyViewPager getPager() {
 		return pager;
 	}
@@ -69,6 +71,9 @@ public class CardCarouselFragment extends Fragment {
 		this.inflater = inflater;
         TCGClient.instantiate();
 		counter = 0;
+
+
+
 		options = new DisplayImageOptions.Builder()
 				.showImageForEmptyUri(android.R.drawable.presence_invisible)
 				.showImageOnFail(R.drawable.ic_launcher)
@@ -80,6 +85,8 @@ public class CardCarouselFragment extends Fragment {
 		appState = (MagicAppSettings) getActivity().getApplication();
 		View v = inflater.inflate(R.layout.pagerlayout, null);
 
+        loading = new ProgressDialog(v.getContext());
+        loading.setMessage("Getting prices");
 		pager = (JazzyViewPager) v.findViewById(R.id.pager);
 
 		pager.setOnPageChangeListener(new OnPageChangeListener() {
@@ -100,17 +107,22 @@ public class CardCarouselFragment extends Fragment {
 			public void onPageSelected(int arg0) {
 
                 if(!fromAdvSearch) {
-                    if (arg0 > 48) {
+                    if (arg0 >49) {
                         Random r = new Random();
-                        String z = CardList.allCards + r.nextInt(140);
-                        DeckBrewClient.getAPI().getRandomCards(r.nextInt(), new Callback<Card[]>() {
+
+                        DeckBrewClient.getAPI().getRandomCards(r.nextInt(140), new Callback<Card[]>() {
                             @Override
                             public void success(Card[] cards, Response response) {
+                                Log.i("RESPONSE", response.getUrl());
+                                CardCarouselFragment f = new CardCarouselFragment();
                                 appState.setCardsInCarousel(new Card[cards.length]);
                                 for (int i = 0; i < cards.length; i++) {
                                     appState.getCardsInCarousel()[i] = cards[i];
                                 }
-                                CardCarouselFragment f = new CardCarouselFragment();
+                                int i = 0;
+                                for(ImageListAdapter t : adapters){
+                                    t.notifyDataSetChanged();
+                                }
                                 getActivity().getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
                             }
 
@@ -128,7 +140,8 @@ public class CardCarouselFragment extends Fragment {
 
 		context = v.getContext();
 
-
+        Log.i("FROM ADV", String.valueOf(fromAdvSearch));
+        Log.i("CURRENT ITEM", String.valueOf(currentItem));
 		if(fromAdvSearch){
 			appState.setCardsInCarousel(new Card[appState.getCardsFromAdvSearch().length]);
 			for(int i = 0; i < appState.getCardsInCarousel().length; i++){
@@ -140,8 +153,7 @@ public class CardCarouselFragment extends Fragment {
 			for (int i = 0; i < lists.length; i++) {
 				lists[i] = new ListView(context);
 			}
-			
-			
+
 		}
 		else if(fromSearch){		
 			appState.setCardsInCarousel(new Card[1]);
@@ -171,15 +183,19 @@ public class CardCarouselFragment extends Fragment {
 				public void onItemClick(AdapterView<?> arg0, View arg1,
 						final int arg2, long arg3) {
 					counter = pager.getCurrentItem();
-                    TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet()) ,adapters[counter].getCard().getName(), new Callback<Products>() {
+
+                    loading.show();
+                    TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(),adapters[counter].getCard().getName()) ,adapters[counter].getCard().getName(), new Callback<Products>() {
                         @Override
                         public void success(Products products, Response response) {
+                            loading.hide();
                             pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
                             pricing.showDialog();
                         }
 
                         @Override
                         public void failure(RetrofitError error) {
+                            loading.hide();
                             Log.i("Error", error.getUrl());
 
 
@@ -196,7 +212,8 @@ public class CardCarouselFragment extends Fragment {
 			pages.add(l);
 		}
 		pager.setAdapter(new CustomPagerAdapter(pager, context, pages));
-		
+        if(fromAdvSearch)
+        pager.setCurrentItem(currentItem);
 		return v;
 	}
 
@@ -208,10 +225,18 @@ public class CardCarouselFragment extends Fragment {
 	public void setArguments(Bundle args) {
 		cards = new ArrayList<Card>();
 		
-		if(args.containsKey("FROM ADV SEARCH"))
-		fromAdvSearch = args.getBoolean("FROM ADV SEARCH");
+		if(args.containsKey("FROM ADV SEARCH")) {
+            fromAdvSearch = args.getBoolean("FROM ADV SEARCH");
+            currentItem = args.getInt("CURRENT ITEM");
+        }
+        else{
+            fromAdvSearch = false;
+
+        }
 		if(args.containsKey("FROM SEARCH"))
 		fromSearch = args.getBoolean("FROM SEARCH");
+        else
+        fromSearch = false;
 		//Log.i("CARD SIZE", String.valueOf(cards.size()));
 		super.setArguments(args);
 	}

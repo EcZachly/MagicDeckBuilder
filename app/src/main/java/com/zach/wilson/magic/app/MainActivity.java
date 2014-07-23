@@ -33,6 +33,7 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TableLayout;
 
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -49,6 +50,7 @@ import com.zach.wilson.magic.app.fragments.MyCartFragment;
 import com.zach.wilson.magic.app.fragments.MyDeckFragment;
 import com.zach.wilson.magic.app.fragments.PlaneschaseFragment;
 import com.zach.wilson.magic.app.fragments.SearchFragment;
+import com.zach.wilson.magic.app.helpers.AppRater;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.TCGClient;
@@ -56,19 +58,6 @@ import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
 import com.zach.wilson.magic.app.models.Product;
 import com.zach.wilson.magic.app.models.Products;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -79,8 +68,6 @@ import retrofit.client.Response;
 
 public class MainActivity extends FragmentActivity implements
         SearchFragment.OnItemSelectedListener {
-
-    static String URL = "https://api.deckbrew.com/mtg/cards/typeahead?q=";
     static ArrayList<String> cardCart;
     private String[] mPlanetTitles;
     private DrawerLayout mDrawerLayout;
@@ -89,59 +76,32 @@ public class MainActivity extends FragmentActivity implements
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence title;
     AsyncTask<String, Integer, String> task;
-    private ProgressDialog dialog;
-    ArrayList<String> potentialNames = new ArrayList<String>();
-    String searchString;
-    Resources r;
-    LinearLayout layout;
-    Dialog priceDialog;
-    Card[] cards;
-    String jsonCards;
-    Button search;
-    ListView list;
-    Button random;
-    OnClickListener buttons;
-    String URLP;
-    TableLayout main;
-    Drawable pic;
-    SharedPreferences prefs;
-    Bundle extras;
-
-    String[] urls;
-    String[] namesFromURLS;
-    DisplayImageOptions options;
-    ImageLoader imageLoader;
-    String pricingName;
-    String pricingURL;
     Fragment currentFragment;
     Fragment archenemyFragment;
     SearchFragment searchFragment;
     SearchFragment searchingFragment;
-    Fragment verticalpagerfragment;
     Fragment mydeckFragment;
     Fragment mycartFragment;
     Fragment addDeckFragment;
     Fragment planesChaseFragment;
-    Fragment randomCarouselFragment;
     Fragment advancedSearchFragment;
     Fragment lifeCounterFragment;
     LinearLayout rightDrawer;
     Context context;
-
-
-    AsyncTask<String, String, String> taskLoad;
-    Activity activity;
-    String[] jsonStrings;
-    ArrayList<Card[]> cardsList;
-
-    static String[] fragmentNames = {"Archenemy", "Add Deck",
-            "Advanced Search", "Random Carousel", "View Card"};
     MagicAppSettings appState;
+
+    @Override
+    protected void onStop() {
+        FlurryAgent.onEndSession(this);
+        super.onStop();
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FlurryAgent.onStartSession(this, "4P837N5N2QZSC2BGC3V3");
         appState = (MagicAppSettings) this.getApplicationContext();
         appState.setContextForPreferences(this.getBaseContext(), this);
         if (!this.getSharedPreferences("DECKS", Context.MODE_PRIVATE).getAll()
@@ -150,7 +110,7 @@ public class MainActivity extends FragmentActivity implements
                     .clear().commit();
         }
 
-
+        AppRater.app_launched(this);
         appState.setManager(getFragmentManager());
         cardCart = new ArrayList<String>();
         rightDrawer = (LinearLayout) findViewById(R.id.rightDrawerLayout);
@@ -160,7 +120,6 @@ public class MainActivity extends FragmentActivity implements
         addDeckFragment = new AddDeckFragment();
 
         advancedSearchFragment = new AdvancedSearchFragment();
-        dialog = new ProgressDialog(this);
         initImageLoader(this);
         ArrayList<String> temp = new ArrayList<String>();
         title = getActionBar().getTitle();
@@ -181,19 +140,22 @@ public class MainActivity extends FragmentActivity implements
 
         mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
                 mDrawerLayout, /* DrawerLayout object */
-                R.drawable.navigationdrawericon, /* nav drawer icon to replace 'Up' caret */
+                R.drawable.ic_navigation_drawer, /* nav drawer icon to replace 'Up' caret */
                 R.string.drawer_open, /* "open drawer" description */
                 R.string.drawer_close /* "close drawer" description */) {
 
-            /** Called when a drawer has settled in a completely closed state. */
-
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
             public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
                 getActionBar().setTitle(title);
             }
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-
+                super.onDrawerSlide(drawerView, slideOffset);
             }
         };
         // Set the drawer toggle as the DrawerListener
@@ -325,12 +287,36 @@ public class MainActivity extends FragmentActivity implements
             public boolean onQueryTextChange(String newText) {
 
                 if (newText.length() > 0) {
-                    if (task != null) {
-                        task.cancel(true);
-                    }
+                 DeckBrewClient.getAPI();
+                    DeckBrewClient.deckbrew.getCardsFromStart(newText, new Callback<List<Card>>(){
 
-                    task = new SearchingForNames().execute(URL
-                            + Uri.encode(newText));
+                        @Override
+                        public void success(List<Card> cards, Response response) {
+                                searchingFragment = new SearchFragment();
+                            Bundle args = new Bundle();
+                            CardList.currentCardList = new ArrayList<Card>();
+                            ArrayList<String>names = new ArrayList<String>();
+                            ArrayList<String> URLS = new ArrayList<String>();
+                            for (int i = 0; i < cards.size(); i++) {
+                                names.add(cards.get(i).getName());
+                                URLS.add(cards.get(i).getEditions()[0].getImage_url());
+                                CardList.currentCardList.add(cards.get(i));
+                            }
+                            args.putStringArrayList("POTENTIAL", names);
+                            args.putStringArrayList("URLS", URLS);
+                            searchingFragment.setArguments(args);
+                            getFragmentManager().beginTransaction()
+                                    .replace(R.id.content_frame, searchingFragment).commit();
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+
+                        }
+                    });
+
+
+
                 } else {
 
                     if (task != null) {
@@ -370,10 +356,9 @@ public class MainActivity extends FragmentActivity implements
      */
 
     private void selectItem(int position) {
+        FlurryAgent.logEvent("Drawer Selected Item: " + position);
+
         searchView.setIconified(true);
-        if (taskLoad != null) {
-            taskLoad.cancel(true);
-        }
         Fragment f;
         FragmentManager fragmentManager = getFragmentManager();
         switch (position) {
@@ -538,66 +523,7 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
-    class SearchingForNames extends AsyncTask<String, Integer, String> {
 
-        Card[] cardsFromSearching;
-
-        @Override
-        protected String doInBackground(String... params) {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpResponse response;
-            String responseString = null;
-            try {
-                response = httpclient.execute(new HttpGet(params[0]));
-                StatusLine statusLine = response.getStatusLine();
-                if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    response.getEntity().writeTo(out);
-                    out.close();
-                    responseString = out.toString();
-                } else {
-                    // Closes the connection.
-                    response.getEntity().getContent().close();
-                    throw new IOException(statusLine.getReasonPhrase());
-                }
-            } catch (ClientProtocolException e) {
-                // TODO Handle problems..
-            } catch (IOException e) {
-                // TODO Handle problems..
-            }
-
-            return responseString;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            jsonCards = result;
-            StringReader reader = new StringReader(jsonCards);
-            jsonParse(reader);
-            ArrayList<String> names = new ArrayList<String>();
-            ArrayList<String> urls = new ArrayList<String>();
-            searchingFragment = new SearchFragment();
-            Bundle args = new Bundle();
-            CardList.currentCardList = new ArrayList<Card>();
-            names = new ArrayList<String>();
-            for (int i = 0; i < cardsFromSearching.length; i++) {
-                names.add(cardsFromSearching[i].getName());
-                urls.add(cardsFromSearching[i].getEditions()[0].getImage_url());
-                CardList.currentCardList.add(cardsFromSearching[i]);
-            }
-            args.putStringArrayList("POTENTIAL", names);
-            args.putStringArrayList("URLS", urls);
-            searchingFragment.setArguments(args);
-
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.content_frame, searchingFragment).commit();
-        }
-
-        private void jsonParse(Reader r) {
-            Gson gson = new Gson();
-            cardsFromSearching = gson.fromJson(r, Card[].class);
-        }
-    }
 
     public SearchView getSearchView() {
         return searchView;

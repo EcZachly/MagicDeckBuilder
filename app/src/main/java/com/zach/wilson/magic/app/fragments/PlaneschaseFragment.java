@@ -41,6 +41,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+
 public class PlaneschaseFragment extends Fragment {
 	JazzyViewPager pager;
 	ProgressDialog dialog;
@@ -81,6 +82,7 @@ public class PlaneschaseFragment extends Fragment {
                     for(int i = 0; i <cards.size(); i++){
                         temp.add(cards.get(i));
                     }
+
                     //Randomizes the planes
                     Collections.shuffle(temp);
                     for(int i = 0; i < cards.size(); i++) {
@@ -102,7 +104,7 @@ public class PlaneschaseFragment extends Fragment {
                             public void onItemClick(AdapterView<?> arg0, View arg1,
                                                    final int arg2, long arg3) {
                                 int counter = pager.getCurrentItem();
-                                TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet()), adapters[counter].getCard().getName(), new Callback<Products>() {
+                                TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()), adapters[counter].getCard().getName(), new Callback<Products>() {
                                     @Override
                                     public void success(Products products, Response response) {
                                         pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
@@ -163,7 +165,7 @@ public class PlaneschaseFragment extends Fragment {
 					public void onItemClick(AdapterView<?> arg0, View arg1,
 							final int arg2, long arg3) {
 						counter = pager.getCurrentItem();
-                        TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet()), adapters[counter].getCard().getName(), new Callback<Products>() {
+                        TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()), adapters[counter].getCard().getName(), new Callback<Products>() {
                             @Override
                             public void success(Products products, Response response) {
                                 pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);

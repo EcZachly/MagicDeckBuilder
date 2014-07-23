@@ -5,9 +5,7 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,51 +24,60 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.gson.Gson;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.zach.wilson.magic.app.R.drawable;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
+import com.zach.wilson.magic.app.adapters.LazyAdapter;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-
+//DONE INJECTING
 public class AdvancedSearchFragment extends Fragment {
-    DisplayImageOptions options;
-    static String baseSearchURL = "https://api.deckbrew.com/mtg/cards?";
-    ViewPager pager;
-    ImageLoader imageLoader;
-    ImageView image;
-    View imageView;
+    @InjectView(id.mainType)
     Spinner spinner;
-    boolean AO;
+
+    @InjectView(id.formatParameter)
+    Spinner formatSpinner;
+    @InjectView(id.rarityParameter)
+    Spinner raritySpinner;
+    @InjectView(id.advList)
+    ListView advList;
+    @InjectView(id.ANDOR)
+    RadioGroup ANDOR;
+    @InjectView(id.AND)
+    RadioButton and;
+    @InjectView(id.OR)
+    RadioButton or;
+    ListView list;
+    @InjectView(id.advLayout)
+    RelativeLayout advLayout;
+    @InjectView(id.MultiColor)
+    RadioButton multicolor;
+
+    @InjectView(id.COLORS)
+    LinearLayout colorLayout;
+    OnClickListener colorListener;
+    @InjectView(id.removeSubmit)
+    Button removeSubmit;
+    @InjectView(id.addFormatParameter)
+    Button addFormat;
+
+
+    ImageLoader imageLoader;
     ProgressDialog dialog;
     ArrayList<String> textContainsParameters;
     ArrayList<String> typeContainsParameters;
@@ -79,65 +85,31 @@ public class AdvancedSearchFragment extends Fragment {
     ArrayList<String> advPotentialNames;
     ArrayList<String> formatContainsParameters;
     ArrayList<String> rarityContainsParameters;
-    LinearLayout colorLayout;
-    OnClickListener colorListener;
-    String searchingString;
-    boolean forceStandard;
-    boolean forceModern;
-    Dialog d;
+    boolean AO;
     static String[] formats = {"Standard", "Modern", "Vintage", "Legacy",
             "Commander"};
-    String[] urls;
     static boolean[] colorsChecked = {false, false, false, false, false};
     static String[] colorChecker = {"red", "green", "black", "blue", "white"};
     ImageView[] colors;
-    Spinner formatSpinner;
-    Spinner raritySpinner;
-    Button addFormat;
-    Card[] results;
     ArrayAdapter<String> formatAdapter;
-    ListView advList;
-    RadioGroup ANDOR;
-    RadioButton and;
-    RadioButton or;
-    RadioButton multicolor;
-    String pricingName;
-    String pricingURL;
     ArrayAdapter<String> advAdapter;
     Dialog priceDialog;
     boolean blnMulticolor;
-    ViewGroup group;
-    ListView list;
-    RelativeLayout advLayout;
     Context context;
     View view;
     Activity activity;
-    String websiteURL;
-    String APIpricingURL;
-    Button removeSubmit;
     MagicAppSettings appState;
-    static String APIpricing = "http://partner.tcgplayer.com/x3/phl.asmx/p?pk=MAGICVIEW";
-
-    @Override
-    public void onPause() {
-        if (and != null) {
-            and.setChecked(false);
-        }
-
-        super.onPause();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(layout.advancedsearchview, null);
         this.view = v;
+        ButterKnife.inject(this, v);
         dialog = new ProgressDialog(v.getContext());
         this.activity = getActivity();
         appState = (MagicAppSettings) getActivity().getApplication();
         context = getActivity().getBaseContext();
-        colorLayout = (LinearLayout) v.findViewById(id.COLORS);
-        advLayout = (RelativeLayout) v.findViewById(id.advLayout);
         priceDialog = new Dialog(context);
         imageLoader = ImageLoader.getInstance();
         setUpAdvancedSearch(v);
@@ -148,18 +120,15 @@ public class AdvancedSearchFragment extends Fragment {
     public void setUpAdvancedSearch(View v) {
         // SETTING UP ADVANCED SEARCH
         advPotentialNames = new ArrayList<String>();
-        advList = (ListView) v.findViewById(id.advList);
         textContainsParameters = new ArrayList<String>();
         typeContainsParameters = new ArrayList<String>();
         formatContainsParameters = new ArrayList<String>();
         mainTypeContainsParameters = new ArrayList<String>();
         rarityContainsParameters = new ArrayList<String>();
-        formatSpinner = (Spinner) v.findViewById(id.formatParameter);
         formatAdapter = new ArrayAdapter(context, layout.spinner_item,
                 formats);
         formatSpinner.setAdapter(formatAdapter);
-        addFormat = (Button) v.findViewById(id.addFormatParameter);
-        removeSubmit = (Button) v.findViewById(id.removeSubmit);
+
         addFormat.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -222,8 +191,6 @@ public class AdvancedSearchFragment extends Fragment {
         });
         advAdapter = new ArrayAdapter<String>(context,
                 android.R.layout.simple_list_item_1, advPotentialNames);
-        advList = (ListView) v.findViewById(id.advList);
-        spinner = (Spinner) v.findViewById(id.mainType);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context,
                 layout.spinner_item, CardList.types);
         spinner.setAdapter(spinnerAdapter);
@@ -240,7 +207,6 @@ public class AdvancedSearchFragment extends Fragment {
         });
         ArrayAdapter<String> rarityAdapter = new ArrayAdapter<String>(context,
                 layout.spinner_item, CardList.rarities);
-        raritySpinner = (Spinner) v.findViewById(id.rarityParameter);
         raritySpinner.setAdapter(rarityAdapter);
         Button s = (Button) v.findViewById(id.addRarityParameter);
         s.setOnClickListener(new OnClickListener() {
@@ -252,8 +218,6 @@ public class AdvancedSearchFragment extends Fragment {
             }
 
         });
-
-        ANDOR = (RadioGroup) v.findViewById(id.ANDOR);
         colors = new ImageView[5];
         colors[0] = (ImageView) v.findViewById(id.redManaImage);
         colors[1] = (ImageView) v.findViewById(id.greenManaImage);
@@ -460,7 +424,6 @@ public class AdvancedSearchFragment extends Fragment {
                     for (ImageView view : colors) {
 
                         switch (i) {
-
                             case 0:
                                 view.setImageResource(drawable.red_unavailable);
                                 view.setContentDescription(String
@@ -502,6 +465,7 @@ public class AdvancedSearchFragment extends Fragment {
             }
 
         });
+
         removeSubmit.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -551,19 +515,12 @@ public class AdvancedSearchFragment extends Fragment {
                     }
                     AO = true;
                     blnMulticolor = false;
-
-                    new findAdvancedSearchMatches().execute("");
-
                 } else if (z == or.getId()) {
                     AO = false;
                     blnMulticolor = false;
-                    new findAdvancedSearchMatches().execute("");
 
                 } else if (z == multicolor.getId()) {
                     blnMulticolor = true;
-
-                    new findAdvancedSearchMatches().execute("");
-
                 } else {
                     Toast.makeText(
                             context,
@@ -571,201 +528,64 @@ public class AdvancedSearchFragment extends Fragment {
                             15).show();
 
                 }
-            }
-        });
-        // END SETTING UP ADVANCED SETTINGS
-    }
-
-    class findAdvancedSearchMatches extends AsyncTask<String, Integer, String> {
-
-        ProgressDialog dialog = new ProgressDialog(context);
-
-        @Override
-        protected void onPostExecute(String result) {
-//            Gson gson = new Gson();
-//
-//            results = gson.fromJson(result, Card[].class);
-//
-//            appState.setCardsFromAdvSearch(new Card[results.length]);
-//            for (int i = 0; i < results.length; i++) {
-//                appState.getCardsFromAdvSearch()[i] = results[i];
-//            }
-//
-//            dialog.dismiss();
-//
-//
-//
-//            list = (ListView) view.findViewById(id.advList);
-//
-//            list.setAdapter(new LazyAdapter(activity, results));
-//            list.setOnItemClickListener(new OnItemClickListener() {
-//
-//                @Override
-//                public void onItemClick(AdapterView<?> arg0, View v, int arg2,
-//                                        long arg3) {
-//                    String viewURL = results[arg2].getEditions()[0]
-//                            .getImage_url();
-//                    CardList.selectedCard = results[arg2];
-//                    CardCarouselFragment fragment = new CardCarouselFragment();
-//
-//
-//                    if (CardList.currentCardList != null) {
-//                        CardList.currentCardList.clear();
-//                    } else {
-//                        CardList.currentCardList = new ArrayList<Card>();
-//                    }
-//                    Bundle args = new Bundle();
-//                    args.putBoolean("FROM ADV SEARCH", true);
-//                    args.putInt("CURRENT ITEM", arg2);
-//                    fragment.setArguments(args);
-//                    getFragmentManager().beginTransaction()
-//                            .replace(id.content_frame, fragment)
-//                            .commit();
-//
-//                    Log.i("ISHIDDEN", String.valueOf(isHidden()));
-//                }
-//
-//            });
-//
-//            list.setVisibility(View.VISIBLE);
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-            dialog = new ProgressDialog(view.getContext());
-            dialog.setMessage("Getting Cards");
-            dialog.show();
-            searchingString = baseSearchURL;
-
-
-            ArrayList<String> colorsT = new ArrayList<String>();
-            for (int i = 0; i < colors.length; i++) {
-                if (colorsChecked[i]) {
-                   colorsT.add(colorChecker[i]);
-                }
-            }
-
-            DeckBrewClient.getAPI().getCardsFromAdvAttributes(mainTypeContainsParameters, colorsT, typeContainsParameters, textContainsParameters, formatContainsParameters, rarityContainsParameters, blnMulticolor, new Callback<List<Card>>() {
-                @Override
-                public void success(List<Card> cards, Response response) {
-                    Log.i("URL", response.getUrl());
-
-                    appState.setCardsFromAdvSearch(new Card[cards.size()]);
-                    for (int i = 0; i < cards.size(); i++) {
-                        appState.getCardsFromAdvSearch()[i] = cards.get(i);
+                ArrayList<String> colorsT = new ArrayList<String>();
+                for (int i = 0; i < colors.length; i++) {
+                    if (colorsChecked[i]) {
+                        colorsT.add(colorChecker[i]);
                     }
-                    dialog.dismiss();
-                    list = (ListView) view.findViewById(id.advList);
-                    list.setAdapter(new LazyAdapter(activity, appState.getCardsFromAdvSearch()));
-                    list.setOnItemClickListener(new OnItemClickListener() {
+                }
 
-                        @Override
-                        public void onItemClick(AdapterView<?> arg0, View v, int arg2,
-                                                long arg3) {
-                            String viewURL = appState.getCardsFromAdvSearch()[arg2].getEditions()[0]
-                                    .getImage_url();
-                            CardList.selectedCard = appState.getCardsFromAdvSearch()[arg2];
-                            CardCarouselFragment fragment = new CardCarouselFragment();
-                            Bundle args = new Bundle();
-                            args.putBoolean("FROM ADV SEARCH", true);
-                            args.putInt("CURRENT ITEM", arg2);
-                            fragment.setArguments(args);
-                            getFragmentManager().beginTransaction()
-                                    .replace(id.content_frame, fragment)
-                                    .commit();
-
-                            Log.i("ISHIDDEN", String.valueOf(isHidden()));
+                DeckBrewClient.getAPI().getCardsFromAdvAttributes(mainTypeContainsParameters, colorsT, typeContainsParameters, textContainsParameters, formatContainsParameters, rarityContainsParameters, blnMulticolor, new Callback<List<Card>>() {
+                    @Override
+                    public void success(List<Card> cards, Response response) {
+                        appState.setCardsFromAdvSearch(new Card[cards.size()]);
+                        for (int i = 0; i < cards.size(); i++) {
+                            appState.getCardsFromAdvSearch()[i] = cards.get(i);
                         }
+                        list = (ListView) view.findViewById(id.advList);
+                        list.setAdapter(new LazyAdapter(activity, appState.getCardsFromAdvSearch(), getActivity().getLayoutInflater()));
+                        list.setOnItemClickListener(new OnItemClickListener() {
 
-                    });
+                            @Override
+                            public void onItemClick(AdapterView<?> arg0, View v, int arg2,
+                                                    long arg3) {
+                                String viewURL = appState.getCardsFromAdvSearch()[arg2].getEditions()[0]
+                                        .getImage_url();
+                                CardList.selectedCard = appState.getCardsFromAdvSearch()[arg2];
+                                CardCarouselFragment fragment = new CardCarouselFragment();
+                                Bundle args = new Bundle();
+                                args.putBoolean("FROM ADV SEARCH", true);
+                                args.putInt("CURRENT ITEM", arg2);
+                                fragment.setArguments(args);
+                                getFragmentManager().beginTransaction()
+                                        .replace(id.content_frame, fragment)
+                                        .commit();
 
-                    list.setVisibility(View.VISIBLE);
+                            }
 
-                }
+                        });
 
-                @Override
-                public void failure(RetrofitError retrofitError) {
-                    Log.i("URL", retrofitError.getUrl());
-
-                    dialog.dismiss();
-                }
-            });
+                        list.setVisibility(View.VISIBLE);
 
 
+                    }
 
 
+                    @Override
+                    public void failure(RetrofitError error) {
 
-
-
-
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpResponse response;
-            String responseString = null;
-            try {
-                response = httpclient.execute(new HttpGet(searchingString));
-                StatusLine statusLine = response.getStatusLine();
-                if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    response.getEntity().writeTo(out);
-                    out.close();
-                    responseString = out.toString();
-                } else {
-                    // Closes the connection.
-                    response.getEntity().getContent().close();
-                    throw new IOException(statusLine.getReasonPhrase());
-                }
-            } catch (ClientProtocolException e) {
-                // TODO Handle problems..
-            } catch (IOException e) {
-                // TODO Handle problems..
-            }
-            return responseString;
-        }
-
-        class LazyAdapter extends BaseAdapter {
-
-            private Activity activity;
-            private Card[] data;
-            private LayoutInflater inflater = null;
-            public ImageLoader imageLoader;
-
-            public LazyAdapter(Activity a, Card[] d) {
-                activity = a;
-                data = d;
-                inflater = (LayoutInflater) activity
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                imageLoader = ImageLoader.getInstance();
-
+                    }
+                });
             }
 
-            public int getCount() {
-                return data.length;
-            }
 
-            public Object getItem(int position) {
-                return position;
-            }
+        });
 
-            public long getItemId(int position) {
-                return position;
-            }
-
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View vi = convertView;
-                if (convertView == null)
-                    vi = inflater.inflate(layout.listitem, null);
-                final int pos = position;
-                TextView text = (TextView) vi.findViewById(id.cardName);
-                text.setText(data[position].getName());
-
-                return vi;
-            }
-        }
 
     }
 }
+
+
+
+
+

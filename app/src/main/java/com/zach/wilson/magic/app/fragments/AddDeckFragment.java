@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import com.google.gson.Gson;
 import com.zach.wilson.magic.app.R;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
+import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
 
@@ -51,23 +53,26 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
+
+
+//DONE INJECTING
 public class AddDeckFragment extends Fragment {
-	EditText text;
-	static String URL = "https://api.deckbrew.com/mtg/cards/typeahead?q=";
-	TextView numOfCards;
-	ListView potentialCards;
-	ListView cardsInDeck;
-	SearchView searchView;
-	SearchFragment fragmentList;
-	SharedPreferences prefs;
-	Button save;
-	AsyncTask<String, Integer, String> task;
-	String deck;
-	Bundle extras;
-	boolean editMode;
-	EditText deckName;
+    @InjectView(id.addCardsEditText)EditText text;
+	@InjectView(id.numberOfCards)TextView numOfCards;
+	@InjectView(id.potentialCards)ListView potentialCards;
+	@InjectView(R.id.cardsInDeck)ListView cardsInDeck;
+    @InjectView(id.saveDeck)Button save;
+    @InjectView(id.deckNameEditText)EditText deckName;
+    SharedPreferences prefs;
+    String deck;
+    boolean editMode;
 	Context context;
-	
 	ArrayList<String> oldCardsInDeck;
 	ArrayList<String> holdsAllData;
 	ArrayList<String> tempPotNames;
@@ -75,21 +80,9 @@ public class AddDeckFragment extends Fragment {
 	ArrayList<String> potentialNames;
 	ArrayAdapter<String> adapter;
 	ArrayAdapter<String> cardAdapter;
-	Card[] cardsFromSearching;
 	int holding;
 	ArrayList<Integer> removedSpots;
 
-	public interface OnItemSelectedListener {
-		public void onRssItemSelected(String link);
-	}
-
-	public AddDeckFragment() {
-	}
-
-	
-	
-	
-	
 	@Override
 	public void setArguments(Bundle args) {
 		editMode = args.getBoolean("EDITMODE");	
@@ -105,13 +98,8 @@ public class AddDeckFragment extends Fragment {
 			Log.i("DATA",holdsAllData.get(i));
 			cardsListForList.add(args.getStringArrayList("CARD NAMES").get(i).substring(0, args.getStringArrayList("CARD NAMES").get(i).indexOf("(+)")));
 		}
-		
-		
-		
-		
 		oldCardsInDeck = args.getStringArrayList("CARD NAMES");
 		deck = args.getString("DECK NAME");
-		
 		super.setArguments(args);
 	}
 
@@ -124,14 +112,9 @@ public class AddDeckFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(layout.adddecklayout, null);
 		context = v.getContext();
-		
+	    ButterKnife.inject(this, v);
 		removedSpots = new ArrayList<Integer>();
-		text = (EditText) v.findViewById(id.addCardsEditText);
-		numOfCards = (TextView) v.findViewById(id.numberOfCards);
-		potentialCards = (ListView) v.findViewById(id.potentialCards);
-		cardsInDeck = (ListView) v.findViewById(id.cardsInDeck);
-		save = (Button) v.findViewById(id.saveDeck);
-		deckName = (EditText) v.findViewById(id.deckNameEditText);
+
 		
 		InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -142,12 +125,7 @@ public class AddDeckFragment extends Fragment {
 			holdsAllData = new ArrayList<String>();
 			cardsListForList = new ArrayList<String>();
 		}
-		
-		
-		
 		potentialNames = new ArrayList<String>();
-	
-		
 		prefs = this.getActivity().getSharedPreferences("DECKSNEW",
 				Context.MODE_PRIVATE);
 		tempPotNames = new ArrayList<String>();
@@ -174,10 +152,35 @@ public class AddDeckFragment extends Fragment {
 				String w = s.toString();
 				Log.i("KEY", s.toString());
 				if (s.toString().length() > 0) {
-					if(task != null){
-						task.cancel(true);
-					}
-					task = new SearchingForNames().execute(URL + Uri.encode(s.toString().toLowerCase()));
+                    DeckBrewClient.getAPI();
+                    DeckBrewClient.deckbrew.getCardsFromStart(w, new Callback<List<Card>>(){
+
+                        @Override
+                        public void success(List<Card> cards, Response response) {
+                            if(potentialNames != null){
+                                potentialNames.clear();
+                            }
+                            else{
+                                potentialNames = new ArrayList<String>();
+                            }
+                            ArrayList<String> urls = new ArrayList<String>();
+                            CardList.currentCardList = new ArrayList<Card>();
+
+                            for(int i = 0; i < cards.size(); i++){
+                                potentialNames.add(cards.get(i).getName());
+                                urls.add(cards.get(i).getEditions()[0].getImage_url());
+                                CardList.currentCardList.add(cards.get(i));
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+
+                        }
+                    });
+
+
 				}
 
 			}
@@ -194,9 +197,8 @@ public class AddDeckFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View v, int x,
 					long arg3) {
-				
-				cardsListForList.add(cardsFromSearching[x].getName());
-				holdsAllData.add(cardsFromSearching[x].getName() + "(+)" + cardsFromSearching[x].getId() + "(-)" + cardsFromSearching[x].getEditions()[0].getImage_url());
+				cardsListForList.add(CardList.currentCardList.get(x).getName());
+				holdsAllData.add(CardList.currentCardList.get(x).getName() + "(+)" + CardList.currentCardList.get(x).getId() + "(-)" + CardList.currentCardList.get(x).getEditions()[0].getImage_url());
 				numOfCards.setText(String.valueOf(holding));
 				cardAdapter.notifyDataSetChanged();
 			}
@@ -286,71 +288,4 @@ public class AddDeckFragment extends Fragment {
 		});
 		return v;
 	}
-	
-	
-	class SearchingForNames extends AsyncTask<String, Integer, String> {
-		
-	
-		@Override
-		protected String doInBackground(String... params) {
-			 HttpClient httpclient = new DefaultHttpClient();
-		        HttpResponse response;
-		        String responseString = null;
-		        try {
-		            response = httpclient.execute(new HttpGet(params[0]));
-		            StatusLine statusLine = response.getStatusLine();
-		            if(statusLine.getStatusCode() == HttpStatus.SC_OK){
-		                ByteArrayOutputStream out = new ByteArrayOutputStream();
-		                response.getEntity().writeTo(out);
-		                out.close();
-		                responseString = out.toString();
-		            } else{
-		                //Closes the connection.
-		                response.getEntity().getContent().close();
-		                throw new IOException(statusLine.getReasonPhrase());
-		            }
-		        } catch (ClientProtocolException e) {
-		            //TODO Handle problems..
-		        } catch (IOException e) {
-		            //TODO Handle problems..
-		        }
-		        
-		       
-		        return responseString;		
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			if(potentialNames != null){
-				potentialNames.clear();
-				//CardList.currentCardList.clear();
-			}
-			StringReader reader = new StringReader(result);
-			jsonParse(reader);
-			ArrayList<String> names = new ArrayList<String>();
-			ArrayList<String> urls = new ArrayList<String>();
-			Bundle args = new Bundle();
-			CardList.currentCardList = new ArrayList<Card>();
-			
-			for(int i = 0; i < cardsFromSearching.length; i++){
-				potentialNames.add(cardsFromSearching[i].getName());
-				urls.add(cardsFromSearching[i].getEditions()[0].getImage_url());
-			}
-			
-			
-			
-			adapter.notifyDataSetChanged();
-
-		}
-
-		private void jsonParse(Reader r) {
-			Gson gson = new Gson();
-			cardsFromSearching = gson.fromJson(r, Card[].class);
-		}
-	}
-	
-	public void addToData(String a, String b, String c){
-		holdsAllData.add(a + "(+)" + b + "(-)" + c);		
-	}
-	
 }
