@@ -1,18 +1,18 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.3"
+    compileSdkVersion 20
+    buildToolsVersion '19.1.0'
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 20
         versionCode 24
         versionName "6.3"
     }
     signingConfigs {
         release {
             // We can leave these in environment variables
-            storeFile file("C:\\Users\\Zach\\Desktop\\MagicAppKeystore\\MagicApp.apk")
+          //  storeFile file("C:\\Users\\Zach\\Desktop\\MagicAppKeystore\\MagicApp.apk")
             keyAlias "magic app"
 
             // These two lines make gradle believe that the signingConfigs
@@ -32,11 +32,11 @@ android {
 task askForPasswords << {
     // Must create String because System.readPassword() returns char[]
     // (and assigning that below fails silently)
-    def storePw = new String(System.console().readPassword("Keystore password: "))
-    def keyPw  = new String(System.console().readPassword("Key password: "))
+   // def storePw = new String(System.console().readPassword("Keystore password: "))
+    //def keyPw  = new String(System.console().readPassword("Key password: "))
 
-    android.signingConfigs.release.storePassword = storePw
-    android.signingConfigs.release.keyPassword = keyPw
+   // android.signingConfigs.release.storePassword = storePw
+    //android.signingConfigs.release.keyPassword = keyPw
 }
 
 tasks.whenTaskAdded { theTask ->
@@ -50,4 +50,5 @@ dependencies {
     compile 'com.stanfy:gson-xml-java:0.1.+'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
     compile 'com.jakewharton:butterknife:5.1.1'
+    compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 }

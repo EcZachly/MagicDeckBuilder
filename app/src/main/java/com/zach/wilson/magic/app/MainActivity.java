@@ -11,9 +11,11 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -40,6 +42,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.zach.wilson.magic.app.adapters.MyDrawerAdapter;
 import com.zach.wilson.magic.app.fragments.AddDeckFragment;
 import com.zach.wilson.magic.app.fragments.AdvancedSearchFragment;
@@ -101,6 +104,9 @@ public class MainActivity extends FragmentActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
         FlurryAgent.onStartSession(this, "4P837N5N2QZSC2BGC3V3");
         appState = (MagicAppSettings) this.getApplicationContext();
         appState.setContextForPreferences(this.getBaseContext(), this);
@@ -164,6 +170,7 @@ public class MainActivity extends FragmentActivity implements
         getActionBar().setHomeButtonEnabled(true);
         Random r = new Random();
         String z = CardList.allCards + r.nextInt(140);
+        setUpTintBar();
         if (appState.getCardsInCarousel() == null) {
             Random ra = new Random();
             int za = ra.nextInt(140);
@@ -189,6 +196,16 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+    public void setUpTintBar(){
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setNavigationBarTintEnabled(true);
+        if(Build.VERSION.SDK_INT >= 19){
+            SystemBarTintManager.SystemBarConfig config = tintManager.getConfig();
+            findViewById(android.R.id.content).setPadding(0, config.getPixelInsetTop(true), config.getPixelInsetRight(), config.getPixelInsetBottom());
+        }
+        tintManager.setTintColor(getResources().getColor(R.color.black));
+    }
     private class DrawerItemClickListener implements
             ListView.OnItemClickListener {
 
