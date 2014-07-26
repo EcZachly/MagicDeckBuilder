@@ -55,11 +55,11 @@
         <item>My Decks</item>
         <item>My Cart</item>
         <item>Advanced Search</item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
-        <item></item>
+        <item>Discovery</item>
+        <item/>
+        <item/>
+        <item/>
+        <item/>
     </string-array>
     <string-array name="jazzy_effects">
         <item>Standard</item>
@@ -80,5 +80,6 @@
     <string name="title_item_detail">Item Detail</string>
     <string name="LIFE">LIFE</string>
     <string name="POISON">POISON</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
