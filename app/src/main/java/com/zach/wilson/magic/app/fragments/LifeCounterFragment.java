@@ -22,6 +22,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+
+
+
 public class LifeCounterFragment extends Fragment {
 
 	LayoutInflater inflater;
@@ -33,6 +36,13 @@ public class LifeCounterFragment extends Fragment {
 
     static HashMap<String, Integer> lifeTotals;
     static ArrayList<String> playerNames;
+
+
+
+    public static LifeCounterFragment newInstance(){
+        LifeCounterFragment f = new LifeCounterFragment();
+        return f;
+    }
 
 
 	@Override

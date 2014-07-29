@@ -174,12 +174,7 @@ public class MainActivity extends FragmentActivity implements
             DeckBrewClient.deckbrew.getRandomCards(za, new Callback<Card[]>() {
                 @Override
                 public void success(Card[] cards, Response response) {
-                    Bundle args = new Bundle();
-
-                    args.putSerializable("CARDS FROM MAIN", cards);
-
-                    CardCarouselFragment f = new CardCarouselFragment();
-                    f.setArguments(args);
+                    CardCarouselFragment f = CardCarouselFragment.newInstance(cards, false, false);
                     getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
                 }
 
@@ -421,7 +416,7 @@ public class MainActivity extends FragmentActivity implements
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
                 if (advancedSearchFragment == null) {
-                    advancedSearchFragment = new AdvancedSearchFragment();
+                    advancedSearchFragment = AdvancedSearchFragment.newInstance();
                 }
                 fragmentManager.beginTransaction()
                         .replace(R.id.content_frame, advancedSearchFragment, "ADVSEARCHFRAGMENT")
@@ -488,8 +483,7 @@ public class MainActivity extends FragmentActivity implements
                         public void success(Card[] cards, Response response) {
                             Bundle args = new Bundle();
                             args.putSerializable("CARDS FROM MAIN", cards);
-                            CardCarouselFragment f = new CardCarouselFragment();
-                            f.setArguments(args);
+                            CardCarouselFragment f = CardCarouselFragment.newInstance(cards, false, false);
                             getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
                             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                             TCGClient.instantiate();

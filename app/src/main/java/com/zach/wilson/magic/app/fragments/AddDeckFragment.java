@@ -83,6 +83,23 @@ public class AddDeckFragment extends Fragment {
 	int holding;
 	ArrayList<Integer> removedSpots;
 
+
+
+    public static AddDeckFragment newInstance(ArrayList<String> cards, String deckName, boolean editMode) {
+        AddDeckFragment f = new AddDeckFragment();
+        Bundle args = f.getArguments();
+        if (args == null) {
+            args = new Bundle();
+        }
+        args.putBoolean("EDITMODE", editMode);
+        args.putStringArrayList("CARD NAMES", cards);
+        args.putString("DECK NAME", deckName);
+        f.setArguments(args);
+        return f;
+    }
+
+
+
 	@Override
 	public void setArguments(Bundle args) {
 		editMode = args.getBoolean("EDITMODE");	

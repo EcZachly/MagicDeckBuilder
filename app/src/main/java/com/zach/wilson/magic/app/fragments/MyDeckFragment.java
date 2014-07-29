@@ -148,10 +148,7 @@ public class MyDeckFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				Fragment f = new AddDeckFragment();
-				Bundle args = new Bundle();
-				args.putBoolean("EDITMODE", false);
-				f.setArguments(args);
+               Fragment f = AddDeckFragment.newInstance(new ArrayList<String>(), "", false);
 				getFragmentManager().beginTransaction().replace(id.content_frame, f).commit();
                 FlurryAgent.logEvent("Add Deck Fragment");
 			}

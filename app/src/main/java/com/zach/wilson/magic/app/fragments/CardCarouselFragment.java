@@ -43,13 +43,13 @@ import retrofit.client.Response;
 
 public class CardCarouselFragment extends Fragment {
 	JazzyViewPager pager;
-	Card[] cards;
+	static Card[] cards;
 	Context context;
     int currentItem;
 	LayoutInflater inflater;
 	DisplayImageOptions options;
-	boolean fromAdvSearch;
-	boolean fromSearch;
+	static boolean fromAdvSearch;
+	static boolean fromSearch;
 	ListView[] lists;
 	ImageListAdapter[] adapters;
 	int counter;
@@ -211,38 +211,36 @@ public class CardCarouselFragment extends Fragment {
 	@Override
 	public void setArguments(Bundle args) {
 
-		
-		if(args.containsKey("FROM ADV SEARCH")) {
-            fromAdvSearch = args.getBoolean("FROM ADV SEARCH");
-            currentItem = args.getInt("CURRENT ITEM");
-            Card[] temp = (Card[]) args.get("CARDS FROM ADV SEARCH");
-            cards = new Card[temp.length];
-            for(int i = 0; i < cards.length; i++){
-                cards[i] = temp[i];
-            }
-
-
+		cards = new Card[((Card[])args.getSerializable("CARDARRAY")).length];
+        for(int i = 0; i < cards.length; i++){
+            cards[i] =((Card[]) args.getSerializable("CARDARRAY"))[i];
         }
-        else if(args.containsKey("FROM SEARCH")){
-            Card c =  (Card) args.get("CARD FROM SEARCH");
-
-            cards = new Card[1];
-            cards[0] = c;
-
-            fromAdvSearch = false;
-            fromSearch = args.getBoolean("FROM SEARCH");
-        }
-        else {
-            fromSearch = false;
-            fromAdvSearch = false;
-            Card[] temp = (Card[]) args.get("CARDS FROM MAIN");
-            cards = new Card[temp.length];
-            for(int i = 0; i < temp.length; i++){
-                cards[i] = temp[i];
-            }
-        }
-		//Log.i("CARD SIZE", String.valueOf(cards.size()));
+		fromAdvSearch = args.getBoolean("advSearch");
+        fromSearch = args.getBoolean("search");
 		super.setArguments(args);
 	}
+
+
+    public static CardCarouselFragment newInstance(Card[] cardList, boolean fAdvSearch, boolean fSearch){
+        CardCarouselFragment f = new CardCarouselFragment();
+
+        Bundle args = f.getArguments();
+        if(args == null){
+            args = new Bundle();
+        }
+
+
+        cards = new Card[cardList.length];
+        for(int i = 0; i < cards.length; i++){
+            cards[i] = cardList[i];
+        }
+        fromAdvSearch = fAdvSearch;
+        fromSearch = fSearch;
+        args.putSerializable("CARDARRAY", cards);
+        args.putBoolean("advSearch", fAdvSearch);
+        args.putBoolean("search", fSearch);
+        f.setArguments(args);
+        return f;
+    }
 
 }

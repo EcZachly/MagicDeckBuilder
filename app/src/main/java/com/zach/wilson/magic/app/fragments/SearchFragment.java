@@ -75,19 +75,13 @@ public class SearchFragment extends Fragment {
 						.getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus()
 						.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-				CardCarouselFragment fragment = new CardCarouselFragment();
-				Bundle args = new Bundle();
-
-                args.putSerializable("CARD FROM SEARCH", CardList.currentCardList.get(x));
-				args.putBoolean("FROM SEARCH", true);
-				fragment.setArguments(args);
+                Card[] temp = new Card[1];
+                temp[0] = CardList.currentCardList.get(x);
+				CardCarouselFragment fragment = CardCarouselFragment.newInstance(temp, false, true);
 				adapter.clear();
 				adapter.notifyDataSetChanged();
-				Log.i("ISHIDDEN", String.valueOf(isHidden()));
 				getFragmentManager().beginTransaction()
 						.replace(id.content_frame, fragment).commit();
-				Log.i("ISHIDDEN", String.valueOf(isHidden()));
 
 			}
 

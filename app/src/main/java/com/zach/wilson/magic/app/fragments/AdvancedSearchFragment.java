@@ -100,6 +100,15 @@ public class AdvancedSearchFragment extends Fragment {
     View view;
     Activity activity;
 
+    public static AdvancedSearchFragment newInstance(){
+        AdvancedSearchFragment f = new AdvancedSearchFragment();
+
+
+
+        return f;
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -551,12 +560,7 @@ public class AdvancedSearchFragment extends Fragment {
                                 String viewURL = cardsFromSearch[arg2].getEditions()[0]
                                         .getImage_url();
                                 CardList.selectedCard = cardsFromSearch[arg2];
-                                CardCarouselFragment fragment = new CardCarouselFragment();
-                                Bundle args = new Bundle();
-                                args.putSerializable("CARDS FROM ADV SEARCH", cardsFromSearch);
-                                args.putBoolean("FROM ADV SEARCH", true);
-                                args.putInt("CURRENT ITEM", arg2);
-                                fragment.setArguments(args);
+                                CardCarouselFragment fragment =  CardCarouselFragment.newInstance(cardsFromSearch, true, false);
                                 getFragmentManager().beginTransaction()
                                         .replace(id.content_frame, fragment)
                                         .commit();
