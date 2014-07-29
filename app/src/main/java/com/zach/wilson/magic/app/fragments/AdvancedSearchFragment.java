@@ -77,6 +77,8 @@ public class AdvancedSearchFragment extends Fragment {
     Button addFormat;
 
 
+    Card[] cardsFromSearch;
+
     ImageLoader imageLoader;
     ProgressDialog dialog;
     ArrayList<String> textContainsParameters;
@@ -538,9 +540,9 @@ public class AdvancedSearchFragment extends Fragment {
                 DeckBrewClient.getAPI().getCardsFromAdvAttributes(mainTypeContainsParameters, colorsT, typeContainsParameters, textContainsParameters, formatContainsParameters, rarityContainsParameters, blnMulticolor, new Callback<List<Card>>() {
                     @Override
                     public void success(List<Card> cards, Response response) {
-                        appState.setCardsFromAdvSearch(new Card[cards.size()]);
-                        for (int i = 0; i < cards.size(); i++) {
-                            appState.getCardsFromAdvSearch()[i] = cards.get(i);
+                        cardsFromSearch = new Card[cards.size()];
+                        for(int i = 0; i < cardsFromSearch.length; i++){
+                            cardsFromSearch[i] = cards.get(i);
                         }
                         list = (ListView) view.findViewById(id.advList);
                         list.setAdapter(new LazyAdapter(activity, appState.getCardsFromAdvSearch(), getActivity().getLayoutInflater()));
@@ -554,6 +556,7 @@ public class AdvancedSearchFragment extends Fragment {
                                 CardList.selectedCard = appState.getCardsFromAdvSearch()[arg2];
                                 CardCarouselFragment fragment = new CardCarouselFragment();
                                 Bundle args = new Bundle();
+                                args.putSerializable("CARDS FROM ADV SEARCH", cardsFromSearch);
                                 args.putBoolean("FROM ADV SEARCH", true);
                                 args.putInt("CURRENT ITEM", arg2);
                                 fragment.setArguments(args);

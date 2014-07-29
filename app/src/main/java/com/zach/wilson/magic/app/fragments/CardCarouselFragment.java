@@ -44,7 +44,7 @@ import retrofit.client.Response;
 
 public class CardCarouselFragment extends Fragment {
 	JazzyViewPager pager;
-	ArrayList<Card> cards;
+	Card[] cards;
 	Context context;
     int currentItem;
 	LayoutInflater inflater;
@@ -71,7 +71,6 @@ public class CardCarouselFragment extends Fragment {
 		this.inflater = inflater;
         TCGClient.instantiate();
 		counter = 0;
-
 
 
 		options = new DisplayImageOptions.Builder()
@@ -115,10 +114,8 @@ public class CardCarouselFragment extends Fragment {
                             public void success(Card[] cards, Response response) {
                                 Log.i("RESPONSE", response.getUrl());
                                 CardCarouselFragment f = new CardCarouselFragment();
-                                appState.setCardsInCarousel(new Card[cards.length]);
-                                for (int i = 0; i < cards.length; i++) {
-                                    appState.getCardsInCarousel()[i] = cards[i];
-                                }
+                                Bundle args = new Bundle();
+                                args.putSerializable("CARDS FROM MAIN", cards);
                                 int i = 0;
                                 for(ImageListAdapter t : adapters){
                                     t.notifyDataSetChanged();
@@ -143,21 +140,14 @@ public class CardCarouselFragment extends Fragment {
         Log.i("FROM ADV", String.valueOf(fromAdvSearch));
         Log.i("CURRENT ITEM", String.valueOf(currentItem));
 		if(fromAdvSearch){
-			appState.setCardsInCarousel(new Card[appState.getCardsFromAdvSearch().length]);
-			for(int i = 0; i < appState.getCardsInCarousel().length; i++){
-				appState.getCardsInCarousel()[i] = appState.getCardsFromAdvSearch()[i];
-				
-			}
-			lists = new ListView[appState.getCardsFromAdvSearch().length];
+			lists = new ListView[cards.length];
 			adapters = new ImageListAdapter[lists.length];
 			for (int i = 0; i < lists.length; i++) {
 				lists[i] = new ListView(context);
 			}
 
 		}
-		else if(fromSearch){		
-			appState.setCardsInCarousel(new Card[1]);
-			appState.getCardsInCarousel()[0] = appState.getCardFromSearch();
+		else if(fromSearch){
 			lists = new ListView[1];
 			adapters = new ImageListAdapter[1];
 			for (int i = 0; i < 1; i++) {
@@ -175,7 +165,7 @@ public class CardCarouselFragment extends Fragment {
 		for (int i = 0; i < lists.length; i++) {
 			
 			//Log.i("APPSTATE", appState.getCardsInCarousel()[i].getName());
-			adapters[i] = new ImageListAdapter(this.inflater, appState.getCardsInCarousel()[i], options);
+			adapters[i] = new ImageListAdapter(this.inflater,cards[i], options);
 			lists[i].setAdapter(adapters[i]);
 			lists[i].setOnItemClickListener(new OnItemClickListener() {
 
@@ -189,7 +179,7 @@ public class CardCarouselFragment extends Fragment {
                         @Override
                         public void success(Products products, Response response) {
                             loading.hide();
-                            pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
+                            pricing = new PriceDialog(context,  adapters[pager.getCurrentItem()].getCard(), arg2, products);
                             pricing.showDialog();
                         }
 
@@ -223,20 +213,37 @@ public class CardCarouselFragment extends Fragment {
 
 	@Override
 	public void setArguments(Bundle args) {
-		cards = new ArrayList<Card>();
+
 		
 		if(args.containsKey("FROM ADV SEARCH")) {
             fromAdvSearch = args.getBoolean("FROM ADV SEARCH");
             currentItem = args.getInt("CURRENT ITEM");
-        }
-        else{
-            fromAdvSearch = false;
+            Card[] temp = (Card[]) args.get("CARDS FROM ADV SEARCH");
+            cards = new Card[temp.length];
+            for(int i = 0; i < cards.length; i++){
+                cards[i] = temp[i];
+            }
+
 
         }
-		if(args.containsKey("FROM SEARCH"))
-		fromSearch = args.getBoolean("FROM SEARCH");
-        else
-        fromSearch = false;
+        else if(args.containsKey("FROM SEARCH")){
+            Card c =  (Card) args.get("CARD FROM SEARCH");
+
+            cards = new Card[1];
+            cards[0] = c;
+
+            fromAdvSearch = false;
+            fromSearch = args.getBoolean("FROM SEARCH");
+        }
+        else {
+            fromSearch = false;
+            fromAdvSearch = false;
+            Card[] temp = (Card[]) args.get("CARDS FROM MAIN");
+            cards = new Card[temp.length];
+            for(int i = 0; i < temp.length; i++){
+                cards[i] = temp[i];
+            }
+        }
 		//Log.i("CARD SIZE", String.valueOf(cards.size()));
 		super.setArguments(args);
 	}

@@ -61,10 +61,10 @@ public class ImageAdapterPlaneschase extends BaseAdapter{
 		
 			
 		if(e.getSet().startsWith("Vintage") || e.getSet().startsWith("Masters") || e.getSet().startsWith("Duels of the Planeswalkers")){
-			Log.i("SETV", e.getSet());
+			//Log.i("SETV", e.getSet());
 		}
 		else{
-			Log.i("SET", e.getSet());
+			//Log.i("SET", e.getSet());
 			cardEditions.add(e);
 		}
 		

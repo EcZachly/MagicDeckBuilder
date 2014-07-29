@@ -55,7 +55,6 @@ import com.zach.wilson.magic.app.fragments.PlaneschaseFragment;
 import com.zach.wilson.magic.app.fragments.SearchFragment;
 import com.zach.wilson.magic.app.helpers.AppRater;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
@@ -91,7 +90,6 @@ public class MainActivity extends FragmentActivity implements
     Fragment lifeCounterFragment;
     LinearLayout rightDrawer;
     Context context;
-    MagicAppSettings appState;
 
     @Override
     protected void onStop() {
@@ -108,8 +106,7 @@ public class MainActivity extends FragmentActivity implements
 
 
         FlurryAgent.onStartSession(this, "4P837N5N2QZSC2BGC3V3");
-        appState = (MagicAppSettings) this.getApplicationContext();
-        appState.setContextForPreferences(this.getBaseContext(), this);
+
         if (!this.getSharedPreferences("DECKS", Context.MODE_PRIVATE).getAll()
                 .isEmpty()) {
             this.getSharedPreferences("DECKS", Context.MODE_PRIVATE).edit()
@@ -117,7 +114,6 @@ public class MainActivity extends FragmentActivity implements
         }
 
         AppRater.app_launched(this);
-        appState.setManager(getFragmentManager());
         cardCart = new ArrayList<String>();
         rightDrawer = (LinearLayout) findViewById(R.id.rightDrawerLayout);
         context = this.getBaseContext();
@@ -171,18 +167,19 @@ public class MainActivity extends FragmentActivity implements
         Random r = new Random();
         String z = CardList.allCards + r.nextInt(140);
         setUpTintBar();
-        if (appState.getCardsInCarousel() == null) {
+        if (getFragmentManager().findFragmentByTag("PLANESCHASEFRAGMENT") == null) {
             Random ra = new Random();
             int za = ra.nextInt(140);
             DeckBrewClient.getAPI();
             DeckBrewClient.deckbrew.getRandomCards(za, new Callback<Card[]>() {
                 @Override
                 public void success(Card[] cards, Response response) {
-                    appState.setCardsInCarousel(new Card[cards.length]);
-                    for (int i = 0; i < cards.length; i++) {
-                        appState.getCardsInCarousel()[i] = cards[i];
-                    }
+                    Bundle args = new Bundle();
+
+                    args.putSerializable("CARDS FROM MAIN", cards);
+
                     CardCarouselFragment f = new CardCarouselFragment();
+                    f.setArguments(args);
                     getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
                 }
 
@@ -193,6 +190,11 @@ public class MainActivity extends FragmentActivity implements
 
             });
 
+        }
+        else{
+            PlaneschaseFragment f = (PlaneschaseFragment) getFragmentManager().findFragmentByTag("PLANESCHASEFRAGMENT");
+
+            getFragmentManager().beginTransaction().replace(R.id.content_frame, f, "PLANESCHASEFRAGMENT").commit();
         }
     }
 
@@ -225,6 +227,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
@@ -255,7 +258,7 @@ public class MainActivity extends FragmentActivity implements
                     fragmentManager.beginTransaction().remove(f).commit();
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, lifeCounterFragment)
+                        .replace(R.id.content_frame, lifeCounterFragment, "LIFECOUNTERFRAGMENT")
                         .commit();
                 return false;
             }
@@ -277,7 +280,7 @@ public class MainActivity extends FragmentActivity implements
                     fragmentManager.beginTransaction().remove(f).commit();
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, mycartFragment).commit();
+                        .replace(R.id.content_frame, mycartFragment, "MYCARTFRAGMENT").commit();
                 return false;
             }
 
@@ -293,7 +296,7 @@ public class MainActivity extends FragmentActivity implements
                 Bundle args = new Bundle();
                 searchFragment.setArguments(args);
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.content_frame, searchFragment).commit();
+                        .replace(R.id.content_frame, searchFragment, "SEARCHFRAGMENT").commit();
 
             }
 
@@ -393,7 +396,7 @@ public class MainActivity extends FragmentActivity implements
                 }
 
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, archenemyFragment).commit();
+                        .replace(R.id.content_frame, archenemyFragment, "ARCHENEMYFRAGMENT").commit();
                 currentFragment = archenemyFragment;
 
                 break;
@@ -409,7 +412,7 @@ public class MainActivity extends FragmentActivity implements
 
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, mydeckFragment).commit();
+                        .replace(R.id.content_frame, mydeckFragment, "MYDECKFRAGMENT").commit();
                 currentFragment = mydeckFragment;
 
 
@@ -421,13 +424,13 @@ public class MainActivity extends FragmentActivity implements
                     advancedSearchFragment = new AdvancedSearchFragment();
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, advancedSearchFragment)
+                        .replace(R.id.content_frame, advancedSearchFragment, "ADVSEARCHFRAGMENT")
                         .commit();
                 currentFragment = advancedSearchFragment;
 
                 break;
             case 2:
-                this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
 
                 if (planesChaseFragment == null) {
                     planesChaseFragment = new PlaneschaseFragment();
@@ -440,9 +443,9 @@ public class MainActivity extends FragmentActivity implements
                 }
 
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, planesChaseFragment).commit();
+                        .replace(R.id.content_frame, planesChaseFragment, "PLANESCHASEFRAGMENT").commit();
                 currentFragment = planesChaseFragment;
-
+                this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
                 break;
             case 1:
@@ -456,7 +459,7 @@ public class MainActivity extends FragmentActivity implements
                     fragmentManager.beginTransaction().remove(f).commit();
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, lifeCounterFragment).commit();
+                        .replace(R.id.content_frame, lifeCounterFragment, "LIFECOUNTERFRAGMENT").commit();
                 currentFragment = lifeCounterFragment;
 
                 break;
@@ -470,49 +473,36 @@ public class MainActivity extends FragmentActivity implements
                     fragmentManager.beginTransaction().remove(f).commit();
                 }
                 fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, mycartFragment).commit();
+                        .replace(R.id.content_frame, mycartFragment, "MYCARTFRAGMENT").commit();
                 currentFragment = mycartFragment;
 
 
                 break;
             case 0:
-                appState.setCardsInCarousel(null);
-                Random r = new Random();
-                String z = CardList.allCards + r.nextInt(140);
-                DeckBrewClient.getAPI().getRandomCards(r.nextInt(140), new Callback<Card[]>() {
-                    @Override
-                    public void success(Card[] cards, Response response) {
-                        appState.setCardsInCarousel(new Card[cards.length]);
-                        for (int i = 0; i < cards.length; i++) {
-                            appState.getCardsInCarousel()[i] = cards[i];
+
+
+                    Random r = new Random();
+                    String z = CardList.allCards + r.nextInt(140);
+                    DeckBrewClient.getAPI().getRandomCards(r.nextInt(140), new Callback<Card[]>() {
+                        @Override
+                        public void success(Card[] cards, Response response) {
+                            Bundle args = new Bundle();
+                            args.putSerializable("CARDS FROM MAIN", cards);
+                            CardCarouselFragment f = new CardCarouselFragment();
+                            f.setArguments(args);
+                            getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+                            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                            TCGClient.instantiate();
+
                         }
-                        CardCarouselFragment f = new CardCarouselFragment();
-                        getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
 
-                        TCGClient.instantiate();
-                        for(int i = 0; i < 15; i++)
-                        TCGClient.pricing.getProductPrice("MAGICVIEW", cards[i].getEditions()[0].getSet(), cards[i].getName(), new Callback<Products>(){
+                        @Override
+                        public void failure(RetrofitError error) {
 
-                            @Override
-                            public void success(Products products, Response response) {
-                                Log.i("HERE", products.getProducts().getLowprice());
+                        }
+                    });
+                    break;
 
-                            }
-
-                            @Override
-                            public void failure(RetrofitError error) {
-                                   Log.i("ERROR", error.getMessage());
-                                    Log.i("ERROR", error.getUrl());
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-
-                    }
-                });
-                break;
 
         }
         mDrawerLayout.closeDrawers();
@@ -539,24 +529,15 @@ public class MainActivity extends FragmentActivity implements
     public void onRssItemSelected(String link) {
 
     }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //No call for super(). Bug on API Level > 11.
+    }
 
 
 
     public SearchView getSearchView() {
         return searchView;
-    }
-
-    public void setSearchView(SearchView searchView) {
-        this.searchView = searchView;
-    }
-
-    public Fragment getCurrentFragment() {
-        return currentFragment;
-    }
-
-    public void setCurrentFragment(Fragment currentFragment) {
-        this.currentFragment = currentFragment;
-
     }
 
 }

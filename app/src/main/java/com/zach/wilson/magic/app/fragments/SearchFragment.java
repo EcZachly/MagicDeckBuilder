@@ -7,7 +7,6 @@ import com.zach.wilson.magic.app.MainActivity;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.adapters.MyArrayAdapter;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
 import com.zach.wilson.magic.app.models.Price;
@@ -39,7 +38,6 @@ public class SearchFragment extends Fragment {
 	ArrayList<String> imageURLs;
 	String searchString;
 	View view;
-	MagicAppSettings appState;
 	public SearchFragment() {
 	}
 
@@ -47,7 +45,6 @@ public class SearchFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(layout.listview, null, false);
-		appState = (MagicAppSettings) getActivity().getApplication();
 		context = v.getContext();
 		list = (ListView) v.findViewById(id.listing);
 		adapter = new MyArrayAdapter(context, layout.listitem, potentialNames);
@@ -69,7 +66,6 @@ public class SearchFragment extends Fragment {
 				String viewURL = imageURLs.get(x);
 
 				
-				appState.setCardFromSearch(CardList.currentCardList.get(x));
 				MainActivity activity = (MainActivity) getActivity();
 
 				
@@ -82,6 +78,8 @@ public class SearchFragment extends Fragment {
 
 				CardCarouselFragment fragment = new CardCarouselFragment();
 				Bundle args = new Bundle();
+
+                args.putSerializable("CARD FROM SEARCH", CardList.currentCardList.get(x));
 				args.putBoolean("FROM SEARCH", true);
 				fragment.setArguments(args);
 				adapter.clear();

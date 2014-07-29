@@ -40,12 +40,11 @@ public class PriceDialog{
     LinearLayout layout1, layout2;
     MagicAppSettings appState;
 
-    public PriceDialog(Context c, Application a, Card card, int currentEdition, Products product){
+    public PriceDialog(Context c, Card card, int currentEdition, Products product){
         this.context = c;
         this.card = card;
         this.product = product;
         this.currentEdition = currentEdition;
-        appState = (MagicAppSettings)a;
         priceDialog = new Dialog(context);
         deckDialog = new Dialog(context);
 

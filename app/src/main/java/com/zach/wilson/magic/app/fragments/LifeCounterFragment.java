@@ -7,7 +7,6 @@ import com.zach.wilson.magic.app.R;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.adapters.LifeCounterAdapter;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.models.CardList;
 
 import android.app.Dialog;
@@ -30,9 +29,11 @@ public class LifeCounterFragment extends Fragment {
 	LifeCounterAdapter adapter;
 	Button addPlayer;
 	Button resetGame;
-	ArrayList<String> playerNames;
 	Dialog addPlayerDialog;
-	MagicAppSettings appState;
+
+    static HashMap<String, Integer> lifeTotals;
+    static ArrayList<String> playerNames;
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,20 +45,24 @@ public class LifeCounterFragment extends Fragment {
 		addPlayerDialog = new Dialog(v.getContext());
 		addPlayer = (Button) v.findViewById(id.addPlayer);
 		resetGame = (Button) v.findViewById(id.resetGame);
-		appState = (MagicAppSettings) getActivity().getApplication();
 		playerList = (ListView) v.findViewById(id.lifeCounterList);
 
-		
-		if(appState.getPlayerNames() == null){
-			appState.setPlayerNames(new ArrayList<String>());
-			appState.setLifeTotals(new HashMap<String, Integer>());
-			appState.setPoisonTotals(new HashMap<String, Integer>());
-		}
-		
-		
-		adapter = new LifeCounterAdapter(v.getContext(),
-				id.lifeCounterLayout, getActivity().getApplication());
-		playerList.setAdapter(adapter);
+		if(playerNames == null){
+            playerNames = new ArrayList<String>();
+            lifeTotals = new HashMap<String, Integer>();
+        }
+
+
+		if(adapter == null) {
+            adapter = new LifeCounterAdapter(v.getContext(),
+                    id.lifeCounterLayout, playerNames, lifeTotals);
+            playerList.setAdapter(adapter);
+        }
+        else{
+            adapter.notifyDataSetChanged();
+            playerList.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
 		addPlayer.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -77,17 +82,12 @@ public class LifeCounterFragment extends Fragment {
 					public void onClick(View v) {
 						String temp = edit.getText().toString();
 						edit.setText("");
-						appState.getLifeTotals().put(temp, 20);
-						appState.getPoisonTotals().put(temp, 0);
-						if (appState.getPlayerNames() == null) {
-							appState.getPlayerNames().add(temp);
-						} else {
-							appState.getPlayerNames().add(temp);
-						}
-						adapter = new LifeCounterAdapter(v.getContext(),
-								id.lifeCounterLayout, getActivity()
-										.getApplication());
-						playerList.setAdapter(adapter);
+						playerNames.add(temp);
+                        lifeTotals.put(temp, 20);
+						LifeCounterAdapter.setLifeTotals(lifeTotals);
+                        LifeCounterAdapter.setPlayerNames(playerNames);
+                        adapter.notifyDataSetChanged();
+
 
 					}
 
@@ -102,9 +102,15 @@ public class LifeCounterFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 
-				adapter = new LifeCounterAdapter(v.getContext(),
-						id.lifeCounterLayout, getActivity().getApplication());
-				playerList.setAdapter(adapter);
+                for(String s : playerNames){
+                    lifeTotals.put(s, 20);
+                }
+
+                LifeCounterAdapter.setLifeTotals(lifeTotals);
+                LifeCounterAdapter.setPlayerNames(playerNames);
+
+			    adapter.notifyDataSetChanged();
+               playerList.setAdapter(adapter);
 
 			}
 
@@ -114,6 +120,12 @@ public class LifeCounterFragment extends Fragment {
 	
 	
 	
-	
+
+    public static void setLifeTotals(HashMap<String,Integer> life){
+        lifeTotals = life;
+    }
+    public static void setPlayerNames(ArrayList<String> names){
+        playerNames = names;
+    }
 	
 }
