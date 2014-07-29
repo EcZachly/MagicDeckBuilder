@@ -2,7 +2,9 @@ package com.zach.wilson.magic.app.fragments;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -13,6 +15,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.flurry.android.FlurryAgent;
 import com.zach.wilson.magic.app.R;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
@@ -129,6 +132,10 @@ public class MyCartFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("CURRENT ORDER", CardList.currentOrder);
+
+                FlurryAgent.logEvent("HIT CHECKOUT", map);
 				if (CardList.currentOrder == null) {
 
 				} else {

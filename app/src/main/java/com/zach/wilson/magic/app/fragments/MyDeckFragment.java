@@ -61,6 +61,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SearchView.OnQueryTextListener;
 
+import com.flurry.android.FlurryAgent;
 import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -152,6 +153,7 @@ public class MyDeckFragment extends Fragment {
 				args.putBoolean("EDITMODE", false);
 				f.setArguments(args);
 				getFragmentManager().beginTransaction().replace(id.content_frame, f).commit();
+                FlurryAgent.logEvent("Add Deck Fragment");
 			}
 			
 			

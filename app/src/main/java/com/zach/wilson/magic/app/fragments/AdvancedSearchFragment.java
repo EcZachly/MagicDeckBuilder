@@ -542,7 +542,7 @@ public class AdvancedSearchFragment extends Fragment {
                             cardsFromSearch[i] = cards.get(i);
                         }
                         list = (ListView) view.findViewById(id.advList);
-                        list.setAdapter(new LazyAdapter(activity,cardsFromSearch, getActivity().getLayoutInflater()));
+                        list.setAdapter(new LazyAdapter(getActivity(),cardsFromSearch, getActivity().getLayoutInflater()));
                         list.setOnItemClickListener(new OnItemClickListener() {
 
                             @Override

@@ -165,6 +165,7 @@ public class MainActivity extends FragmentActivity implements
         getActionBar().setHomeButtonEnabled(true);
         Random r = new Random();
         String z = CardList.allCards + r.nextInt(140);
+
         setUpTintBar();
         if (getFragmentManager().findFragmentByTag("PLANESCHASEFRAGMENT") == null) {
             Random ra = new Random();
