@@ -16,7 +16,6 @@ import com.zach.wilson.magic.app.adapters.CustomPagerAdapter;
 import com.zach.wilson.magic.app.adapters.ImageAdapterPlaneschase;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
@@ -57,7 +56,6 @@ public class ArchenemyFragment extends Fragment {
 	Context context;
 	Dialog priceDialog;
 
-	MagicAppSettings appState;
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -65,7 +63,6 @@ public class ArchenemyFragment extends Fragment {
         TCGClient.instantiate();
 		View v = inflater.inflate(R.layout.planesarchenemypagerlayout, null);
 		context = v.getContext();
-		appState = (MagicAppSettings)getActivity().getApplication();
 
         ButterKnife.inject(this, v);
 
@@ -77,7 +74,7 @@ public class ArchenemyFragment extends Fragment {
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 
-		if(appState.getSchemesInCarousel() == null){
+		if(schemes == null){
             DeckBrewClient.getAPI();
             Map<String, String> hm = new HashMap<String, String>();
             hm.put("type", "scheme");
@@ -99,7 +96,7 @@ public class ArchenemyFragment extends Fragment {
                     lists = new ListView[schemes.length];
                     adapters = new ImageAdapterPlaneschase[schemes.length];
                     for (int i = 0; i < schemes.length; i++) {
-                        lists[i] = new ListView(appState.getActivity().getBaseContext());
+                        lists[i] = new ListView(context);
                     }
                     for (int i = 0; i < lists.length; i++) {
                         adapters[i] = new ImageAdapterPlaneschase(inflater, schemes[i], options);
@@ -137,7 +134,7 @@ public class ArchenemyFragment extends Fragment {
                     for (int i = 0; i < lists.length; i++) {
                         pages.add(lists[i]);
                     }
-                    pager.setAdapter(new CustomPagerAdapter(pager, appState.getActivity().getApplicationContext(), pages));
+                    pager.setAdapter(new CustomPagerAdapter(pager, context, pages));
                 }
 
                 @Override
@@ -147,9 +144,9 @@ public class ArchenemyFragment extends Fragment {
             });
 		}
 		else{
-			String[] temp = new String[appState.getSchemesInCarousel().length];
+			String[] temp = new String[schemes.length];
 			for (int i = 0; i < temp.length; i++) {
-				temp[i] = appState.getSchemesInCarousel()[i].getEditions()[0]
+				temp[i] = schemes[i].getEditions()[0]
 						.getImage_url();
 			}
 			context = v.getContext();

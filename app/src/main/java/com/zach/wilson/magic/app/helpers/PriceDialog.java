@@ -38,7 +38,6 @@ public class PriceDialog{
     TextView foil, high, mean, low;
     ImageView share,addToCart, addToDeck, cardInfo;
     LinearLayout layout1, layout2;
-    MagicAppSettings appState;
 
     public PriceDialog(Context c, Card card, int currentEdition, Products product){
         this.context = c;
@@ -110,7 +109,7 @@ public class PriceDialog{
                                 + "\n\n Shared By: Magic Card Viewer on Google Play at:\n"
                                 + CardList.urlToAPP
                 );
-                appState.getActivity().startActivity(
+                context.startActivity(
                         Intent.createChooser(intent, "Share"));
             }
 
@@ -120,7 +119,7 @@ public class PriceDialog{
 
             @Override
             public void onClick(View v) {
-                SharedPreferences prefs = appState.getActivity()
+                SharedPreferences prefs = context
                         .getSharedPreferences("DECKSNEW",
                                 Context.MODE_PRIVATE);
                 Set<String> keys = prefs.getAll().keySet();
@@ -153,7 +152,7 @@ public class PriceDialog{
                     @Override
                     public void onItemClick(AdapterView<?> arg0, View arg1,
                                             int arg2, long arg3) {
-                        SharedPreferences prefs = appState.getActivity()
+                        SharedPreferences prefs = context
                                 .getSharedPreferences("DECKSNEW",
                                         Context.MODE_PRIVATE);
                         Set<String> keys = prefs.getAll().keySet();

@@ -31,7 +31,6 @@ import com.zach.wilson.magic.app.adapters.CustomPagerAdapter;
 import com.zach.wilson.magic.app.adapters.ImageListAdapter;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
@@ -51,7 +50,6 @@ public class CardCarouselFragment extends Fragment {
 	DisplayImageOptions options;
 	boolean fromAdvSearch;
 	boolean fromSearch;
-	MagicAppSettings appState;
 	ListView[] lists;
 	ImageListAdapter[] adapters;
 	int counter;
@@ -81,7 +79,6 @@ public class CardCarouselFragment extends Fragment {
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 
-		appState = (MagicAppSettings) getActivity().getApplication();
 		View v = inflater.inflate(R.layout.pagerlayout, null);
 
         loading = new ProgressDialog(v.getContext());

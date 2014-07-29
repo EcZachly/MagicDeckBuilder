@@ -90,7 +90,6 @@ public class MainActivity extends FragmentActivity implements
     Fragment lifeCounterFragment;
     LinearLayout rightDrawer;
     Context context;
-
     @Override
     protected void onStop() {
         FlurryAgent.onEndSession(this);

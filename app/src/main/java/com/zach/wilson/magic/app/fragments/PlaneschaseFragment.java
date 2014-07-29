@@ -17,7 +17,6 @@ import com.zach.wilson.magic.app.adapters.CustomPagerAdapter;
 import com.zach.wilson.magic.app.adapters.ImageAdapterPlaneschase;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
@@ -49,7 +48,6 @@ public class PlaneschaseFragment extends Fragment {
 	DisplayImageOptions options;
 	Context context;
 	Dialog priceDialog;
-	MagicAppSettings appState;
 	ListView[] lists;
 	ImageAdapterPlaneschase[] adapters;
 	ArrayList<Card> cards;
@@ -61,7 +59,6 @@ public class PlaneschaseFragment extends Fragment {
 			Bundle savedInstanceState) {
 		this.inflater = inflater;
 
-		appState = (MagicAppSettings) getActivity().getApplication();
 		View v = inflater.inflate(layout.planesarchenemypagerlayout, null);
 		context = v.getContext();
 		pager = (JazzyViewPager) v.findViewById(id.planespager);
@@ -71,7 +68,7 @@ public class PlaneschaseFragment extends Fragment {
 				.showImageOnFail(drawable.ic_launcher)
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.displayer(new FadeInBitmapDisplayer(300)).build();
-		if (appState.getPlanesInCarousel() == null) {
+		if (planesInCarousel == null) {
             DeckBrewClient.getAPI();
             Map<String, String> hm = new HashMap<String, String>();
             hm.put("type", "plane");
@@ -80,7 +77,6 @@ public class PlaneschaseFragment extends Fragment {
                 public void success(List<Card> cards, Response response) {
                     planesInCarousel = new Card[cards.size()];
 
-                    appState.setPlanesInCarousel(new Card[cards.size()]);
                     ArrayList<Card> temp = new ArrayList<Card>();
                     for(int i = 0; i <cards.size(); i++){
                         temp.add(cards.get(i));
@@ -145,7 +141,7 @@ public class PlaneschaseFragment extends Fragment {
 
 
 		} else {
-			String[] temp = new String[appState.getPlanesInCarousel().length];
+			String[] temp = new String[planesInCarousel.length];
 			for (int i = 0; i < temp.length; i++) {
 				temp[i] = planesInCarousel[i].getEditions()[0]
 						.getImage_url();
@@ -154,9 +150,9 @@ public class PlaneschaseFragment extends Fragment {
 			context = v.getContext();
 
 
-			lists = new ListView[appState.getPlanesInCarousel().length];
+			lists = new ListView[planesInCarousel.length];
 			adapters = new ImageAdapterPlaneschase[planesInCarousel.length];
-			for (int i = 0; i <appState.getPlanesInCarousel().length; i++) {
+			for (int i = 0; i <planesInCarousel.length; i++) {
 				lists[i] = new ListView(context);
 			}
 			for (int i = 0; i < lists.length; i++) {
