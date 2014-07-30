@@ -56,8 +56,6 @@ public class CardCarouselFragment extends Fragment {
 		this.inflater = inflater;
         TCGClient.instantiate();
 		counter = 0;
-
-
 		options = new DisplayImageOptions.Builder()
 				.showImageForEmptyUri(android.R.drawable.presence_invisible)
 				.showImageOnFail(R.drawable.ic_launcher)
@@ -67,7 +65,6 @@ public class CardCarouselFragment extends Fragment {
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 
 		View v = inflater.inflate(R.layout.pagerlayout, null);
-
         loading = new ProgressDialog(v.getContext());
         loading.setMessage("Getting prices");
 		pager = (JazzyViewPager) v.findViewById(R.id.pager);
@@ -119,7 +116,6 @@ public class CardCarouselFragment extends Fragment {
 		});
 
 		context = v.getContext();
-
         Log.i("FROM ADV", String.valueOf(fromAdvSearch));
         Log.i("CURRENT ITEM", String.valueOf(currentItem));
 		if(fromAdvSearch){

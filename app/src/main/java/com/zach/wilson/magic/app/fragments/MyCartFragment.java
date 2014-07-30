@@ -122,13 +122,18 @@ public class MyCartFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("CURRENT ORDER", CardList.currentOrder);
 
-                FlurryAgent.logEvent("HIT CHECKOUT", map);
 				if (CardList.currentOrder == null) {
 
 				} else {
+
+                    Map<String, String> map = new HashMap<String, String>();
+                    int i = 1;
+                    for(String c : CardList.cardsToOrder){
+                        map.put("CARD" + i, c);
+                        i++;
+                    }
+                    FlurryAgent.logEvent("Checked Out", map);
 					Intent intent = new Intent(Intent.ACTION_VIEW, Uri
 							.parse(CardList.currentOrder));
 					startActivity(intent);

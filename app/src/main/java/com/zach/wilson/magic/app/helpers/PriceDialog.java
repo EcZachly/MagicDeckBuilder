@@ -11,18 +11,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.flurry.android.FlurryAgent;
 import com.zach.wilson.magic.app.R;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
 import com.zach.wilson.magic.app.models.Products;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -126,6 +130,7 @@ public class PriceDialog{
                 ListView view = (ListView) deckDialog
                         .findViewById(R.id.listing);
                 view.setClickable(true);
+                deckNames.add("Create a new Deck");
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                         context, android.R.layout.simple_list_item_activated_1,
                         deckNames);
@@ -135,57 +140,129 @@ public class PriceDialog{
                     @Override
                     public void onItemClick(AdapterView<?> arg0, View arg1,
                                             int arg2, long arg3) {
-                        SharedPreferences prefs = context
-                                .getSharedPreferences("DECKSNEW",
-                                        Context.MODE_PRIVATE);
-                        Set<String> keys = prefs.getAll().keySet();
-                        String deck = deckNames.get(arg2);
-                        int s = prefs.getInt(deck + "SIZE", 0);
-                        s++;
-                        String data;
-                        data = card.getName() + "(+)" + card.getId() + "(-)" + card.getEditions()[0].getImage_url();
-                        prefs.edit().remove(deck + "SIZE").apply();
-                        prefs.edit().putInt(deck + "SIZE", s).apply();
-                        s--;
-                        prefs.edit().putString(deck + "" + s, data)
-                                .apply();
-                        deckDialog.dismiss();
-                        priceDialog.dismiss();
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                                context);
 
-                        // set title
-                        alertDialogBuilder.setTitle("Success!");
-                        alertDialogBuilder
-                                .setMessage(
-                                        card.getName()
-                                                + " was successfully added to deck\n"
-                                                + deck
-                                )
-                                .setCancelable(false)
-                                .setPositiveButton(
-                                        "OK",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(
-                                                    DialogInterface dialog,
-                                                    int id) {
-                                                // if this button is
-                                                // clicked, close
-                                                // current activity
-                                                dialog.cancel();
+                        if (arg2 == deckNames.size() - 1) {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+
+                            alert.setTitle("Creating a new deck!");
+                            alert.setMessage("Enter the name of your new deck: ");
+                            final EditText input = new EditText(context);
+                            alert.setView(input);
+
+                            alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    if (input.getText().length() > 0) {
+                                        SharedPreferences prefs = context
+                                                .getSharedPreferences("DECKSNEW",
+                                                        Context.MODE_PRIVATE);
+                                            prefs.edit().putString(input.getText().toString() + "#", input.getText().toString()).commit();
+                                            prefs.edit().putInt(input.getText().toString() + "SIZE", 1);
+                                        String data;
+                                        data = card.getName() + "(+)" + card.getId() + "(-)" + card.getEditions()[0].getImage_url();
+                                        prefs.edit().putString(input.getText().toString() + "" + 0, data)
+                                                .apply();
+
+                                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                                                context);
+
+                                        // set title
+                                        alertDialogBuilder.setTitle("Success!");
+                                        alertDialogBuilder
+                                                .setMessage(
+                                                        card.getName()
+                                                                + " was successfully added to deck\n"
+                                                                + input.getText().toString()
+                                                )
+                                                .setCancelable(false)
+                                                .setPositiveButton(
+                                                        "OK",
+                                                        new DialogInterface.OnClickListener() {
+                                                            public void onClick(
+                                                                    DialogInterface dialog,
+                                                                    int id) {
+                                                                priceDialog.cancel();
+                                                                deckDialog.cancel();
+                                                                dialog.cancel();
+                                                            }
+                                                        }
+                                                );
+
+                                        // create alert dialog
+                                        AlertDialog alertDialog = alertDialogBuilder
+                                                .create();
+
+                                        // show it
+                                        alertDialog.show();
+
+                                    }
+                                }
+
+
+
+                            });
+
+                            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    deckDialog.dismiss();
+                                    priceDialog.dismiss();
+                                }
+                            });
+
+                            alert.show();
+
+                        } else {
+
+                            SharedPreferences prefs = context
+                                    .getSharedPreferences("DECKSNEW",
+                                            Context.MODE_PRIVATE);
+                            Set<String> keys = prefs.getAll().keySet();
+                            String deck = deckNames.get(arg2);
+                            int s = prefs.getInt(deck + "SIZE", 0);
+                            s++;
+                            String data;
+                            data = card.getName() + "(+)" + card.getId() + "(-)" + card.getEditions()[0].getImage_url();
+                            prefs.edit().remove(deck + "SIZE").apply();
+                            prefs.edit().putInt(deck + "SIZE", s).apply();
+                            s--;
+                            prefs.edit().putString(deck + "" + s, data)
+                                    .apply();
+                            deckDialog.dismiss();
+                            priceDialog.dismiss();
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                                    context);
+
+                            // set title
+                            alertDialogBuilder.setTitle("Success!");
+                            alertDialogBuilder
+                                    .setMessage(
+                                            card.getName()
+                                                    + " was successfully added to deck\n"
+                                                    + deck
+                                    )
+                                    .setCancelable(false)
+                                    .setPositiveButton(
+                                            "OK",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(
+                                                        DialogInterface dialog,
+                                                        int id) {
+                                                    // if this button is
+                                                    // clicked, close
+                                                    // current activity
+                                                    dialog.cancel();
+                                                }
                                             }
-                                        }
-                                );
+                                    );
 
-                        // create alert dialog
-                        AlertDialog alertDialog = alertDialogBuilder
-                                .create();
+                            // create alert dialog
+                            AlertDialog alertDialog = alertDialogBuilder
+                                    .create();
 
-                        // show it
-                        alertDialog.show();
+                            // show it
+                            alertDialog.show();
 
+                        }
                     }
-
                 });
                 deckDialog.setCanceledOnTouchOutside(true);
                 deckDialog.show();
@@ -199,6 +276,12 @@ public class PriceDialog{
 
             @Override
             public void onClick(View v) {
+
+
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("CARD", card.getName());
+                FlurryAgent.logEvent("Card added to cart", map);
+
                 if (CardList.cardsToOrder == null) {
                     CardList.cardsToOrder = new ArrayList<String>();
                 }

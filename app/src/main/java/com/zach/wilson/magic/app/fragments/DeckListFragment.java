@@ -2,10 +2,11 @@ package com.zach.wilson.magic.app.fragments;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 
-
+import com.flurry.android.FlurryAgent;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -171,7 +172,11 @@ public class DeckListFragment extends Fragment {
 
 					@Override
 					public void onClick(View v) {
-						Intent intent = new Intent(Intent.ACTION_SEND);
+
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("CARD", cardNames.get(arg2));
+                        FlurryAgent.logEvent("Shared a Card(From decklist fragment)", map);
+                        Intent intent = new Intent(Intent.ACTION_SEND);
 						intent.setType("text/plain");
 
 						intent.putExtra(
@@ -302,6 +307,13 @@ public class DeckListFragment extends Fragment {
 				for (String s : cardNames) {
 					worker += "\n" + s;
 				}
+                Map<String, String> map = new HashMap<String, String>();
+                int i = 1;
+                for(String c : cardNames){
+                    map.put("CARD" + i, c);
+                    i++;
+                }
+                FlurryAgent.logEvent("Shared a Deck", map);
 
 				Intent intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("text/plain");
