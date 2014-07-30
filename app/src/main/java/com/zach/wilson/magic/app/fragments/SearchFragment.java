@@ -1,6 +1,5 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import com.zach.wilson.magic.app.MainActivity;
@@ -9,7 +8,6 @@ import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.adapters.MyArrayAdapter;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
-import com.zach.wilson.magic.app.models.Price;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -34,7 +32,6 @@ public class SearchFragment extends Fragment {
 	public ListView list;
 	Context context;
 	Fragment fragment;
-	Card[] potentialCards;
 	ArrayList<String> imageURLs;
 	String searchString;
 	View view;

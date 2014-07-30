@@ -1,88 +1,54 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
+
 import android.app.ProgressDialog;
-import android.app.SearchManager;
+
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
+
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
+
 import android.graphics.Bitmap;
-import android.net.Uri;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.v4.view.PagerAdapter;
-import android.util.Log;
+
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.MenuItem.OnMenuItemClickListener;
+
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.SearchView.OnQueryTextListener;
 
 import com.flurry.android.FlurryAgent;
-import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
+
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-import com.zach.wilson.magic.app.R;
 import com.zach.wilson.magic.app.R.drawable;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
-import com.zach.wilson.magic.app.helpers.JazzyViewPager;
-import com.zach.wilson.magic.app.helpers.JazzyViewPager.TransitionEffect;
-import com.zach.wilson.magic.app.models.CardList;
+
+
+
 import com.zach.wilson.magic.app.models.Price;
 
 public class MyDeckFragment extends Fragment {
-
-	String pricingURL;
 	ProgressDialog dialog;
-	Dialog priceDialog;
+
 	ListView list;
 	SharedPreferences prefs;
 	ArrayList<String> deckNames;
@@ -90,31 +56,19 @@ public class MyDeckFragment extends Fragment {
 	Map<String, ?> map;
 	ArrayList<String> cardsInDeck;
 	ArrayList<String> cardsInDeckUrls;
-	ImageLoader imageLoader;
-	String pricingName;
-	Button edit;
+
 	Context context;
-	Button delete;
+
 	Button view;
-	Button priceDeck;
-	Button shareDeck;
-	Button addDeckToCart;
 	String selectedDeckName;
-	String selectedCardID;
-	Price[] deckPrices;
-	String[] namesFromURLS;
+
 	DisplayImageOptions options;
 	String[] keyArr;
 	AsyncTask<String, Integer, String> task;
-	SearchView searchView;
-	SearchFragment fragmentList;
 	ArrayList<String> cardNames;
 	ArrayList<Price> prices;
 	ArrayList<String> cardIDs;
-	JazzyViewPager pager;
 	ArrayList<String> cardsInDeckToShare;
-	ArrayList<String> cardsInDeckToAddToCart;
-	ArrayList<String> cardNamesToAddToCart;
 	ArrayList<String> cardURLs;
 	ArrayList<String> cardNamesToShow;
 	TextView addNewDeck;

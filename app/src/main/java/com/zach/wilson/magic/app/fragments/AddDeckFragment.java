@@ -1,25 +1,13 @@
 package com.zach.wilson.magic.app.fragments;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.google.gson.Gson;
 import com.zach.wilson.magic.app.R;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
@@ -30,11 +18,7 @@ import com.zach.wilson.magic.app.models.CardList;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -50,7 +34,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import butterknife.ButterKnife;

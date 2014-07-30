@@ -1,7 +1,7 @@
 package com.zach.wilson.magic.app.helpers;
 
 
-import android.util.Log;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import retrofit.converter.Converter;
 import retrofit.mime.TypedByteArray;
 import retrofit.mime.TypedInput;
 import retrofit.mime.TypedOutput;
-import retrofit.mime.TypedString;
+
 
 /**
  * A {@link Converter} which uses SimpleXML for reading and writing entities.

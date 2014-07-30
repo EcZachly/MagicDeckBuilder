@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 public class CustomPagerAdapter extends PagerAdapter {
 
-	private Context mContext;
+
 	private Vector<View> pages;
 	private JazzyViewPager pager;
 
@@ -20,7 +20,6 @@ public class CustomPagerAdapter extends PagerAdapter {
 	
 	public CustomPagerAdapter(JazzyViewPager pager, Context context,
 			Vector<View> pages) {
-		this.mContext = context;
 		this.pages = pages;
 		this.pager = pager;
 	}

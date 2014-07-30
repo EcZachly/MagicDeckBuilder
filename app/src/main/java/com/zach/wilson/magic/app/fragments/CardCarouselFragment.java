@@ -1,12 +1,8 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.util.ArrayList;
-
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
-import android.app.Dialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -17,13 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
+
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
+
 import android.widget.ListView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.zach.wilson.magic.app.R;
@@ -34,7 +29,6 @@ import com.zach.wilson.magic.app.helpers.JazzyViewPager;
 import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
-import com.zach.wilson.magic.app.models.CardList;
 import com.zach.wilson.magic.app.models.Products;
 
 import retrofit.Callback;
@@ -55,13 +49,6 @@ public class CardCarouselFragment extends Fragment {
 	int counter;
     PriceDialog pricing;
     ProgressDialog loading;
-	public JazzyViewPager getPager() {
-		return pager;
-	}
-
-	public void setPager(JazzyViewPager pager) {
-		this.pager = pager;
-	}
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater,
@@ -102,22 +89,21 @@ public class CardCarouselFragment extends Fragment {
 			@Override
 			public void onPageSelected(int arg0) {
 
+
+                Log.i("PAGE", String.valueOf(arg0));
                 if(!fromAdvSearch) {
-                    if (arg0 >49) {
+                    if (arg0 >= 24) {
                         Random r = new Random();
 
                         DeckBrewClient.getAPI().getRandomCards(r.nextInt(140), new Callback<Card[]>() {
                             @Override
                             public void success(Card[] cards, Response response) {
                                 Log.i("RESPONSE", response.getUrl());
-                                CardCarouselFragment f = new CardCarouselFragment();
-                                Bundle args = new Bundle();
-                                args.putSerializable("CARDS FROM MAIN", cards);
-                                int i = 0;
-                                for(ImageListAdapter t : adapters){
-                                    t.notifyDataSetChanged();
-                                }
+                                CardCarouselFragment f = CardCarouselFragment.newInstance(cards, false, false);
+
+
                                 getActivity().getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+                                pager.setCurrentItem(0);
                             }
 
                             @Override
@@ -125,7 +111,7 @@ public class CardCarouselFragment extends Fragment {
 
                             }
                         });
-                        pager.setCurrentItem(0);
+
                     }
                 }
 			}
@@ -152,16 +138,14 @@ public class CardCarouselFragment extends Fragment {
 			}
 		}
 		else{
-			lists = new ListView[50];
-			adapters = new ImageListAdapter[50];
-			for (int i = 0; i < 50; i++) {
+			lists = new ListView[25];
+			adapters = new ImageListAdapter[25];
+			for (int i = 0; i < 25; i++) {
 				lists[i] = new ListView(context);
 			}
 			
 		}	
 		for (int i = 0; i < lists.length; i++) {
-			
-			//Log.i("APPSTATE", appState.getCardsInCarousel()[i].getName());
 			adapters[i] = new ImageListAdapter(this.inflater,cards[i], options);
 			lists[i].setAdapter(adapters[i]);
 			lists[i].setOnItemClickListener(new OnItemClickListener() {

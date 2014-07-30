@@ -66,7 +66,7 @@ public class PlaneschaseFragment extends Fragment {
 				.showImageForEmptyUri(drawable.ic_launcher)
 				.imageScaleType(ImageScaleType.EXACTLY)
 				.showImageOnFail(drawable.ic_launcher)
-				.bitmapConfig(Bitmap.Config.RGB_565)
+				.bitmapConfig(Bitmap.Config.RGB_565).imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 		if (planesInCarousel == null) {
             DeckBrewClient.getAPI();

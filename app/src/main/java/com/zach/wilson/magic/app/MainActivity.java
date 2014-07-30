@@ -1,26 +1,21 @@
 package com.zach.wilson.magic.app;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.ProgressDialog;
+
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.SharedPreferences;
+
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
+
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,17 +23,15 @@ import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
+
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.TableLayout;
+
 
 import com.flurry.android.FlurryAgent;
-import com.google.gson.Gson;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
@@ -58,8 +51,7 @@ import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
-import com.zach.wilson.magic.app.models.Product;
-import com.zach.wilson.magic.app.models.Products;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -163,10 +155,10 @@ public class MainActivity extends FragmentActivity implements
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-        Random r = new Random();
-        String z = CardList.allCards + r.nextInt(140);
 
-        setUpTintBar();
+
+
+        //setUpTintBar();
         if (getFragmentManager().findFragmentByTag("PLANESCHASEFRAGMENT") == null) {
             Random ra = new Random();
             int za = ra.nextInt(140);
@@ -237,7 +229,7 @@ public class MainActivity extends FragmentActivity implements
 
         searchView = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
-        MenuItem lifeCounter = (MenuItem) menu
+        MenuItem lifeCounter =  menu
                 .findItem(R.id.lifeCounterActionBar);
         lifeCounter.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 

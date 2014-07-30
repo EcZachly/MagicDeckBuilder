@@ -1,18 +1,10 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.io.ByteArrayOutputStream;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -26,9 +18,9 @@ import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager.TransitionEffect;
-import com.zach.wilson.magic.app.helpers.PriceDialog;
+
 import com.zach.wilson.magic.app.helpers.TCGClient;
-import com.zach.wilson.magic.app.models.Card;
+
 import com.zach.wilson.magic.app.models.CardList;
 import com.zach.wilson.magic.app.models.Products;
 
@@ -41,16 +33,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.ActionBarDrawerToggle;
+
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;

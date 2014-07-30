@@ -25,9 +25,8 @@ import com.zach.wilson.magic.app.models.Products;
 import java.util.ArrayList;
 import java.util.Set;
 
-/**
- * Created by Zach on 7/13/2014.
- */
+
+
 public class PriceDialog{
     Card card;
     Dialog deckDialog;
@@ -57,22 +56,6 @@ public class PriceDialog{
 
     public void setCard(Card card) {
         this.card = card;
-    }
-
-    public Products getProduct() {
-        return product;
-    }
-
-    public void setProduct(Products product) {
-        this.product = product;
-    }
-
-    public int getCurrentEdition() {
-        return currentEdition;
-    }
-
-    public void setCurrentEdition(int currentEdition) {
-        this.currentEdition = currentEdition;
     }
 
     public void showDialog() {
@@ -161,11 +144,11 @@ public class PriceDialog{
                         s++;
                         String data;
                         data = card.getName() + "(+)" + card.getId() + "(-)" + card.getEditions()[0].getImage_url();
-                        prefs.edit().remove(deck + "SIZE").commit();
-                        prefs.edit().putInt(deck + "SIZE", s).commit();
+                        prefs.edit().remove(deck + "SIZE").apply();
+                        prefs.edit().putInt(deck + "SIZE", s).apply();
                         s--;
                         prefs.edit().putString(deck + "" + s, data)
-                                .commit();
+                                .apply();
                         deckDialog.dismiss();
                         priceDialog.dismiss();
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
@@ -210,8 +193,7 @@ public class PriceDialog{
             }
 
         });
-        //	Button toWebsite = (Button) t.findViewById(R.id.toWebsite);
-        //toWebsite.setVisibility(View.GONE);
+
 
         addToCart.setOnClickListener(new View.OnClickListener() {
 
