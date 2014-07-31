@@ -1,12 +1,8 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.util.ArrayList;
-
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
-import android.app.Dialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -17,13 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
+
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
+
 import android.widget.ListView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.zach.wilson.magic.app.R;
@@ -31,11 +26,9 @@ import com.zach.wilson.magic.app.adapters.CustomPagerAdapter;
 import com.zach.wilson.magic.app.adapters.ImageListAdapter;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
-import com.zach.wilson.magic.app.models.CardList;
 import com.zach.wilson.magic.app.models.Products;
 
 import retrofit.Callback;
@@ -44,26 +37,18 @@ import retrofit.client.Response;
 
 public class CardCarouselFragment extends Fragment {
 	JazzyViewPager pager;
-	ArrayList<Card> cards;
+	static Card[] cards;
 	Context context;
     int currentItem;
 	LayoutInflater inflater;
 	DisplayImageOptions options;
-	boolean fromAdvSearch;
-	boolean fromSearch;
-	MagicAppSettings appState;
+	static boolean fromAdvSearch;
+	static boolean fromSearch;
 	ListView[] lists;
 	ImageListAdapter[] adapters;
 	int counter;
     PriceDialog pricing;
     ProgressDialog loading;
-	public JazzyViewPager getPager() {
-		return pager;
-	}
-
-	public void setPager(JazzyViewPager pager) {
-		this.pager = pager;
-	}
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater,
@@ -71,9 +56,6 @@ public class CardCarouselFragment extends Fragment {
 		this.inflater = inflater;
         TCGClient.instantiate();
 		counter = 0;
-
-
-
 		options = new DisplayImageOptions.Builder()
 				.showImageForEmptyUri(android.R.drawable.presence_invisible)
 				.showImageOnFail(R.drawable.ic_launcher)
@@ -82,9 +64,7 @@ public class CardCarouselFragment extends Fragment {
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 
-		appState = (MagicAppSettings) getActivity().getApplication();
 		View v = inflater.inflate(R.layout.pagerlayout, null);
-
         loading = new ProgressDialog(v.getContext());
         loading.setMessage("Getting prices");
 		pager = (JazzyViewPager) v.findViewById(R.id.pager);
@@ -106,24 +86,21 @@ public class CardCarouselFragment extends Fragment {
 			@Override
 			public void onPageSelected(int arg0) {
 
+
+                Log.i("PAGE", String.valueOf(arg0));
                 if(!fromAdvSearch) {
-                    if (arg0 >49) {
+                    if (arg0 >= 24) {
                         Random r = new Random();
 
                         DeckBrewClient.getAPI().getRandomCards(r.nextInt(140), new Callback<Card[]>() {
                             @Override
                             public void success(Card[] cards, Response response) {
                                 Log.i("RESPONSE", response.getUrl());
-                                CardCarouselFragment f = new CardCarouselFragment();
-                                appState.setCardsInCarousel(new Card[cards.length]);
-                                for (int i = 0; i < cards.length; i++) {
-                                    appState.getCardsInCarousel()[i] = cards[i];
-                                }
-                                int i = 0;
-                                for(ImageListAdapter t : adapters){
-                                    t.notifyDataSetChanged();
-                                }
+                                CardCarouselFragment f = CardCarouselFragment.newInstance(cards, false, false);
+
+
                                 getActivity().getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+                                pager.setCurrentItem(0);
                             }
 
                             @Override
@@ -131,7 +108,7 @@ public class CardCarouselFragment extends Fragment {
 
                             }
                         });
-                        pager.setCurrentItem(0);
+
                     }
                 }
 			}
@@ -139,25 +116,17 @@ public class CardCarouselFragment extends Fragment {
 		});
 
 		context = v.getContext();
-
         Log.i("FROM ADV", String.valueOf(fromAdvSearch));
         Log.i("CURRENT ITEM", String.valueOf(currentItem));
 		if(fromAdvSearch){
-			appState.setCardsInCarousel(new Card[appState.getCardsFromAdvSearch().length]);
-			for(int i = 0; i < appState.getCardsInCarousel().length; i++){
-				appState.getCardsInCarousel()[i] = appState.getCardsFromAdvSearch()[i];
-				
-			}
-			lists = new ListView[appState.getCardsFromAdvSearch().length];
+			lists = new ListView[cards.length];
 			adapters = new ImageListAdapter[lists.length];
 			for (int i = 0; i < lists.length; i++) {
 				lists[i] = new ListView(context);
 			}
 
 		}
-		else if(fromSearch){		
-			appState.setCardsInCarousel(new Card[1]);
-			appState.getCardsInCarousel()[0] = appState.getCardFromSearch();
+		else if(fromSearch){
 			lists = new ListView[1];
 			adapters = new ImageListAdapter[1];
 			for (int i = 0; i < 1; i++) {
@@ -165,17 +134,15 @@ public class CardCarouselFragment extends Fragment {
 			}
 		}
 		else{
-			lists = new ListView[50];
-			adapters = new ImageListAdapter[50];
-			for (int i = 0; i < 50; i++) {
+			lists = new ListView[25];
+			adapters = new ImageListAdapter[25];
+			for (int i = 0; i < 25; i++) {
 				lists[i] = new ListView(context);
 			}
 			
 		}	
 		for (int i = 0; i < lists.length; i++) {
-			
-			//Log.i("APPSTATE", appState.getCardsInCarousel()[i].getName());
-			adapters[i] = new ImageListAdapter(this.inflater, appState.getCardsInCarousel()[i], options);
+			adapters[i] = new ImageListAdapter(this.inflater,cards[i], options);
 			lists[i].setAdapter(adapters[i]);
 			lists[i].setOnItemClickListener(new OnItemClickListener() {
 
@@ -189,7 +156,7 @@ public class CardCarouselFragment extends Fragment {
                         @Override
                         public void success(Products products, Response response) {
                             loading.hide();
-                            pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
+                            pricing = new PriceDialog(context,  adapters[pager.getCurrentItem()].getCard(), arg2, products);
                             pricing.showDialog();
                         }
 
@@ -223,22 +190,37 @@ public class CardCarouselFragment extends Fragment {
 
 	@Override
 	public void setArguments(Bundle args) {
-		cards = new ArrayList<Card>();
-		
-		if(args.containsKey("FROM ADV SEARCH")) {
-            fromAdvSearch = args.getBoolean("FROM ADV SEARCH");
-            currentItem = args.getInt("CURRENT ITEM");
-        }
-        else{
-            fromAdvSearch = false;
 
+		cards = new Card[((Card[])args.getSerializable("CARDARRAY")).length];
+        for(int i = 0; i < cards.length; i++){
+            cards[i] =((Card[]) args.getSerializable("CARDARRAY"))[i];
         }
-		if(args.containsKey("FROM SEARCH"))
-		fromSearch = args.getBoolean("FROM SEARCH");
-        else
-        fromSearch = false;
-		//Log.i("CARD SIZE", String.valueOf(cards.size()));
+		fromAdvSearch = args.getBoolean("advSearch");
+        fromSearch = args.getBoolean("search");
 		super.setArguments(args);
 	}
+
+
+    public static CardCarouselFragment newInstance(Card[] cardList, boolean fAdvSearch, boolean fSearch){
+        CardCarouselFragment f = new CardCarouselFragment();
+
+        Bundle args = f.getArguments();
+        if(args == null){
+            args = new Bundle();
+        }
+
+
+        cards = new Card[cardList.length];
+        for(int i = 0; i < cards.length; i++){
+            cards[i] = cardList[i];
+        }
+        fromAdvSearch = fAdvSearch;
+        fromSearch = fSearch;
+        args.putSerializable("CARDARRAY", cards);
+        args.putBoolean("advSearch", fAdvSearch);
+        args.putBoolean("search", fSearch);
+        f.setArguments(args);
+        return f;
+    }
 
 }

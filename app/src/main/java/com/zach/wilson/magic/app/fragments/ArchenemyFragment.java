@@ -16,7 +16,6 @@ import com.zach.wilson.magic.app.adapters.CustomPagerAdapter;
 import com.zach.wilson.magic.app.adapters.ImageAdapterPlaneschase;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
@@ -48,7 +47,7 @@ public class ArchenemyFragment extends Fragment {
 	@InjectView(R.id.planespager)JazzyViewPager pager;
 	ListView[] lists;
 	ImageAdapterPlaneschase[] adapters;
-	ArrayList<Card> cards;
+	Card[] schemes;
 	int counter;
 	ProgressDialog dialog;
     PriceDialog pricing;
@@ -56,7 +55,7 @@ public class ArchenemyFragment extends Fragment {
 	DisplayImageOptions options;
 	Context context;
 	Dialog priceDialog;
-	MagicAppSettings appState;
+
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -64,7 +63,6 @@ public class ArchenemyFragment extends Fragment {
         TCGClient.instantiate();
 		View v = inflater.inflate(R.layout.planesarchenemypagerlayout, null);
 		context = v.getContext();
-		appState = (MagicAppSettings)getActivity().getApplication();
 
         ButterKnife.inject(this, v);
 
@@ -76,31 +74,32 @@ public class ArchenemyFragment extends Fragment {
 				.bitmapConfig(Bitmap.Config.RGB_565)
 				.displayer(new FadeInBitmapDisplayer(300)).build();
 
-		if(appState.getSchemesInCarousel() == null){
+		if(schemes == null){
             DeckBrewClient.getAPI();
             Map<String, String> hm = new HashMap<String, String>();
             hm.put("type", "scheme");
             DeckBrewClient.deckbrew.getCardsFromAttributes(hm, new Callback<List<Card>>() {
                 @Override
                 public void success(List<Card> cards, Response response) {
-                    appState.setSchemesInCarousel(new Card[cards.size()]);
+                    schemes = new Card[cards.size()];
+
                     ArrayList<Card> temp = new ArrayList<Card>();
-                    for (int i = 0; i < cards.size(); i++) {
+                        for (int i = 0; i < cards.size(); i++) {
                         temp.add(cards.get(i));
                     }
                     //Randomizes the planes
                     Collections.shuffle(temp);
                     for (int i = 0; i < cards.size(); i++) {
-                        appState.getSchemesInCarousel()[i] = temp.get(i);
+                       schemes[i] = cards.get(i);
                     }
 
-                    lists = new ListView[appState.getSchemesInCarousel().length];
-                    adapters = new ImageAdapterPlaneschase[appState.getSchemesInCarousel().length];
-                    for (int i = 0; i < appState.getSchemesInCarousel().length; i++) {
-                        lists[i] = new ListView(appState.getActivity().getBaseContext());
+                    lists = new ListView[schemes.length];
+                    adapters = new ImageAdapterPlaneschase[schemes.length];
+                    for (int i = 0; i < schemes.length; i++) {
+                        lists[i] = new ListView(context);
                     }
                     for (int i = 0; i < lists.length; i++) {
-                        adapters[i] = new ImageAdapterPlaneschase(inflater, appState.getSchemesInCarousel()[i], options);
+                        adapters[i] = new ImageAdapterPlaneschase(inflater, schemes[i], options);
                         lists[i].setAdapter(adapters[i]);
                         lists[i].setOnItemClickListener(new OnItemClickListener() {
 
@@ -112,7 +111,7 @@ public class ArchenemyFragment extends Fragment {
                                 TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()) ,adapters[counter].getCard().getName(), new Callback<Products>() {
                                     @Override
                                     public void success(Products products, Response response) {
-                                        pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
+                                        pricing = new PriceDialog(context,  adapters[pager.getCurrentItem()].getCard(), arg2, products);
                                         pricing.showDialog();
                                         Log.i("PRODUCT", products.getProducts().getHiprice());
                                     }
@@ -135,7 +134,7 @@ public class ArchenemyFragment extends Fragment {
                     for (int i = 0; i < lists.length; i++) {
                         pages.add(lists[i]);
                     }
-                    pager.setAdapter(new CustomPagerAdapter(pager, appState.getActivity().getApplicationContext(), pages));
+                    pager.setAdapter(new CustomPagerAdapter(pager, context, pages));
                 }
 
                 @Override
@@ -145,29 +144,22 @@ public class ArchenemyFragment extends Fragment {
             });
 		}
 		else{
-			String[] temp = new String[appState.getSchemesInCarousel().length];
+			String[] temp = new String[schemes.length];
 			for (int i = 0; i < temp.length; i++) {
-				temp[i] = appState.getSchemesInCarousel()[i].getEditions()[0]
+				temp[i] = schemes[i].getEditions()[0]
 						.getImage_url();
 			}
 			context = v.getContext();
 
 			
-			if(cards == null){
-				cards = new ArrayList<Card>();
-				for(int i = 0; i <appState.getSchemesInCarousel().length; i++){
-					cards.add(appState.getSchemesInCarousel()[i]);
-				}
-				
-				
-			}		
-			lists = new ListView[cards.size()];
-			adapters = new ImageAdapterPlaneschase[cards.size()];
-			for (int i = 0; i < cards.size(); i++) {
+
+			lists = new ListView[schemes.length];
+			adapters = new ImageAdapterPlaneschase[schemes.length];
+			for (int i = 0; i <schemes.length; i++) {
 				lists[i] = new ListView(context);
 			}
 			for (int i = 0; i < lists.length; i++) {
-				adapters[i] = new ImageAdapterPlaneschase(inflater, cards.get(i), options);
+				adapters[i] = new ImageAdapterPlaneschase(inflater, schemes[i], options);
 				lists[i].setAdapter(adapters[i]);
 				lists[i].setOnItemClickListener(new OnItemClickListener() {
 
@@ -178,7 +170,7 @@ public class ArchenemyFragment extends Fragment {
                         TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()), adapters[counter].getCard().getName(), new Callback<Products>() {
                             @Override
                             public void success(Products products, Response response) {
-                                pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
+                                pricing = new PriceDialog(context,  adapters[pager.getCurrentItem()].getCard(), arg2, products);
                                 pricing.showDialog();
                                 Log.i("PRODUCT", products.getProducts().getHiprice());
                             }

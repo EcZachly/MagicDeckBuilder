@@ -17,7 +17,6 @@ import com.zach.wilson.magic.app.adapters.CustomPagerAdapter;
 import com.zach.wilson.magic.app.adapters.ImageAdapterPlaneschase;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
@@ -49,10 +48,10 @@ public class PlaneschaseFragment extends Fragment {
 	DisplayImageOptions options;
 	Context context;
 	Dialog priceDialog;
-	MagicAppSettings appState;
 	ListView[] lists;
 	ImageAdapterPlaneschase[] adapters;
 	ArrayList<Card> cards;
+    Card[] planesInCarousel;
 	int counter;
     PriceDialog pricing;
 	@Override
@@ -60,7 +59,6 @@ public class PlaneschaseFragment extends Fragment {
 			Bundle savedInstanceState) {
 		this.inflater = inflater;
 
-		appState = (MagicAppSettings) getActivity().getApplication();
 		View v = inflater.inflate(layout.planesarchenemypagerlayout, null);
 		context = v.getContext();
 		pager = (JazzyViewPager) v.findViewById(id.planespager);
@@ -68,16 +66,17 @@ public class PlaneschaseFragment extends Fragment {
 				.showImageForEmptyUri(drawable.ic_launcher)
 				.imageScaleType(ImageScaleType.EXACTLY)
 				.showImageOnFail(drawable.ic_launcher)
-				.bitmapConfig(Bitmap.Config.RGB_565)
+				.bitmapConfig(Bitmap.Config.RGB_565).imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
 				.displayer(new FadeInBitmapDisplayer(300)).build();
-		if (appState.getPlanesInCarousel() == null) {
+		if (planesInCarousel == null) {
             DeckBrewClient.getAPI();
             Map<String, String> hm = new HashMap<String, String>();
             hm.put("type", "plane");
             DeckBrewClient.deckbrew.getCardsFromAttributes(hm, new Callback<List<Card>>() {
                 @Override
                 public void success(List<Card> cards, Response response) {
-                    appState.setPlanesInCarousel(new Card[cards.size()]);
+                    planesInCarousel = new Card[cards.size()];
+
                     ArrayList<Card> temp = new ArrayList<Card>();
                     for(int i = 0; i <cards.size(); i++){
                         temp.add(cards.get(i));
@@ -86,17 +85,17 @@ public class PlaneschaseFragment extends Fragment {
                     //Randomizes the planes
                     Collections.shuffle(temp);
                     for(int i = 0; i < cards.size(); i++) {
-                        appState.getPlanesInCarousel()[i] = temp.get(i);
+                    planesInCarousel[i] = temp.get(i);
                     }
                     final ListView[] lists;
                     final ImageAdapterPlaneschase[] adapters;
-                    lists = new ListView[appState.getPlanesInCarousel().length];
-                    adapters = new ImageAdapterPlaneschase[appState.getPlanesInCarousel().length];
-                    for (int i = 0; i < appState.getPlanesInCarousel().length; i++) {
-                        lists[i] = new ListView(appState.getActivity().getBaseContext());
+                    lists = new ListView[planesInCarousel.length];
+                    adapters = new ImageAdapterPlaneschase[planesInCarousel.length];
+                    for (int i = 0; i < planesInCarousel.length; i++) {
+                        lists[i] = new ListView(context);
                     }
                     for (int i = 0; i < lists.length; i++) {
-                        adapters[i] = new ImageAdapterPlaneschase(inflater, appState.getPlanesInCarousel()[i], options);
+                        adapters[i] = new ImageAdapterPlaneschase(inflater, planesInCarousel[i], options);
                         lists[i].setAdapter(adapters[i]);
                         lists[i].setOnItemClickListener(new OnItemClickListener() {
 
@@ -107,7 +106,7 @@ public class PlaneschaseFragment extends Fragment {
                                 TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()), adapters[counter].getCard().getName(), new Callback<Products>() {
                                     @Override
                                     public void success(Products products, Response response) {
-                                        pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
+                                        pricing = new PriceDialog(context, adapters[pager.getCurrentItem()].getCard(), arg2, products);
                                         pricing.showDialog();
                                         Log.i("PRODUCT", products.getProducts().getHiprice());
                                     }
@@ -130,7 +129,7 @@ public class PlaneschaseFragment extends Fragment {
                     for (int i = 0; i < lists.length; i++) {
                         pages.add(lists[i]);
                     }
-                    pager.setAdapter(new CustomPagerAdapter(pager, appState.getActivity().getApplicationContext(), pages));
+                    pager.setAdapter(new CustomPagerAdapter(pager,context, pages));
                 }
 
                 @Override
@@ -142,22 +141,22 @@ public class PlaneschaseFragment extends Fragment {
 
 
 		} else {
-			String[] temp = new String[appState.getPlanesInCarousel().length];
+			String[] temp = new String[planesInCarousel.length];
 			for (int i = 0; i < temp.length; i++) {
-				temp[i] = appState.getPlanesInCarousel()[i].getEditions()[0]
+				temp[i] = planesInCarousel[i].getEditions()[0]
 						.getImage_url();
 			}
 
 			context = v.getContext();
 
 
-			lists = new ListView[appState.getPlanesInCarousel().length];
-			adapters = new ImageAdapterPlaneschase[appState.getPlanesInCarousel().length];
-			for (int i = 0; i <appState.getPlanesInCarousel().length; i++) {
+			lists = new ListView[planesInCarousel.length];
+			adapters = new ImageAdapterPlaneschase[planesInCarousel.length];
+			for (int i = 0; i <planesInCarousel.length; i++) {
 				lists[i] = new ListView(context);
 			}
 			for (int i = 0; i < lists.length; i++) {
-				adapters[i] = new ImageAdapterPlaneschase(inflater, appState.getPlanesInCarousel()[i], options);
+				adapters[i] = new ImageAdapterPlaneschase(inflater, planesInCarousel[i], options);
 				lists[i].setAdapter(adapters[i]);
 				lists[i].setOnItemClickListener(new OnItemClickListener() {
 
@@ -168,7 +167,7 @@ public class PlaneschaseFragment extends Fragment {
                         TCGClient.pricing.getProductPrice("MAGICVIEW", TCGClient.formatSet(adapters[counter].getCardEditions().get(arg2).getSet(), adapters[counter].getCard().getName()), adapters[counter].getCard().getName(), new Callback<Products>() {
                             @Override
                             public void success(Products products, Response response) {
-                                pricing = new PriceDialog(context, appState, adapters[pager.getCurrentItem()].getCard(), arg2, products);
+                                pricing = new PriceDialog(context, adapters[pager.getCurrentItem()].getCard(), arg2, products);
                                 pricing.showDialog();
                                 Log.i("PRODUCT", products.getProducts().getHiprice());
                             }

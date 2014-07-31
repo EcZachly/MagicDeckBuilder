@@ -1,19 +1,14 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
+import java.util.Map;
 
-import com.zach.wilson.magic.app.R;
+
+import com.flurry.android.FlurryAgent;
+
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.models.CardList;
@@ -25,11 +20,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -129,9 +122,18 @@ public class MyCartFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 
+
 				if (CardList.currentOrder == null) {
 
 				} else {
+
+                    Map<String, String> map = new HashMap<String, String>();
+                    int i = 1;
+                    for(String c : CardList.cardsToOrder){
+                        map.put("CARD" + i, c);
+                        i++;
+                    }
+                    FlurryAgent.logEvent("Checked Out", map);
 					Intent intent = new Intent(Intent.ACTION_VIEW, Uri
 							.parse(CardList.currentOrder));
 					startActivity(intent);

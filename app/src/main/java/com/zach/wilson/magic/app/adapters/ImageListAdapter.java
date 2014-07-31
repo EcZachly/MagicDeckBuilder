@@ -64,9 +64,12 @@ public class ImageListAdapter extends BaseAdapter{
 			//Log.i("SETV", e.getSet());
 		}
 		else{
-			//Log.i("SET", e.getSet());
-			cardEditions.add(e);
+		    if(!e.getImage_url().substring(0, (e.getImage_url().length() - 4)).endsWith("/0")){
+                cardEditions.add(e);
+            }
+
 		}
+
 		
 
 

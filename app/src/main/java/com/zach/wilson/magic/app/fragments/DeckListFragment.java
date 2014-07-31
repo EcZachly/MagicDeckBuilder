@@ -1,19 +1,12 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.io.ByteArrayOutputStream;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.flurry.android.FlurryAgent;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -26,9 +19,9 @@ import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager;
 import com.zach.wilson.magic.app.helpers.JazzyViewPager.TransitionEffect;
-import com.zach.wilson.magic.app.helpers.PriceDialog;
+
 import com.zach.wilson.magic.app.helpers.TCGClient;
-import com.zach.wilson.magic.app.models.Card;
+
 import com.zach.wilson.magic.app.models.CardList;
 import com.zach.wilson.magic.app.models.Products;
 
@@ -41,16 +34,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.ActionBarDrawerToggle;
+
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -181,7 +172,11 @@ public class DeckListFragment extends Fragment {
 
 					@Override
 					public void onClick(View v) {
-						Intent intent = new Intent(Intent.ACTION_SEND);
+
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("CARD", cardNames.get(arg2));
+                        FlurryAgent.logEvent("Shared a Card(From decklist fragment)", map);
+                        Intent intent = new Intent(Intent.ACTION_SEND);
 						intent.setType("text/plain");
 
 						intent.putExtra(
@@ -312,6 +307,13 @@ public class DeckListFragment extends Fragment {
 				for (String s : cardNames) {
 					worker += "\n" + s;
 				}
+                Map<String, String> map = new HashMap<String, String>();
+                int i = 1;
+                for(String c : cardNames){
+                    map.put("CARD" + i, c);
+                    i++;
+                }
+                FlurryAgent.logEvent("Shared a Deck", map);
 
 				Intent intent = new Intent(Intent.ACTION_SEND);
 				intent.setType("text/plain");

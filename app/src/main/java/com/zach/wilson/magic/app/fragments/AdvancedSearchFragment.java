@@ -32,7 +32,6 @@ import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.adapters.LazyAdapter;
 import com.zach.wilson.magic.app.helpers.DeckBrewClient;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
 
@@ -77,6 +76,8 @@ public class AdvancedSearchFragment extends Fragment {
     Button addFormat;
 
 
+    Card[] cardsFromSearch;
+
     ImageLoader imageLoader;
     ProgressDialog dialog;
     ArrayList<String> textContainsParameters;
@@ -98,7 +99,15 @@ public class AdvancedSearchFragment extends Fragment {
     Context context;
     View view;
     Activity activity;
-    MagicAppSettings appState;
+
+    public static AdvancedSearchFragment newInstance(){
+        AdvancedSearchFragment f = new AdvancedSearchFragment();
+
+
+
+        return f;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -108,7 +117,6 @@ public class AdvancedSearchFragment extends Fragment {
         ButterKnife.inject(this, v);
         dialog = new ProgressDialog(v.getContext());
         this.activity = getActivity();
-        appState = (MagicAppSettings) getActivity().getApplication();
         context = getActivity().getBaseContext();
         priceDialog = new Dialog(context);
         imageLoader = ImageLoader.getInstance();
@@ -525,7 +533,7 @@ public class AdvancedSearchFragment extends Fragment {
                     Toast.makeText(
                             context,
                             "Must select either\nInclude Color or Ignore Color",
-                            15).show();
+                            Toast.LENGTH_LONG).show();
 
                 }
                 ArrayList<String> colorsT = new ArrayList<String>();
@@ -538,25 +546,21 @@ public class AdvancedSearchFragment extends Fragment {
                 DeckBrewClient.getAPI().getCardsFromAdvAttributes(mainTypeContainsParameters, colorsT, typeContainsParameters, textContainsParameters, formatContainsParameters, rarityContainsParameters, blnMulticolor, new Callback<List<Card>>() {
                     @Override
                     public void success(List<Card> cards, Response response) {
-                        appState.setCardsFromAdvSearch(new Card[cards.size()]);
-                        for (int i = 0; i < cards.size(); i++) {
-                            appState.getCardsFromAdvSearch()[i] = cards.get(i);
+                        cardsFromSearch = new Card[cards.size()];
+                        for(int i = 0; i < cardsFromSearch.length; i++){
+                            cardsFromSearch[i] = cards.get(i);
                         }
                         list = (ListView) view.findViewById(id.advList);
-                        list.setAdapter(new LazyAdapter(activity, appState.getCardsFromAdvSearch(), getActivity().getLayoutInflater()));
+                        list.setAdapter(new LazyAdapter(getActivity(),cardsFromSearch, getActivity().getLayoutInflater()));
                         list.setOnItemClickListener(new OnItemClickListener() {
 
                             @Override
                             public void onItemClick(AdapterView<?> arg0, View v, int arg2,
                                                     long arg3) {
-                                String viewURL = appState.getCardsFromAdvSearch()[arg2].getEditions()[0]
+                                String viewURL = cardsFromSearch[arg2].getEditions()[0]
                                         .getImage_url();
-                                CardList.selectedCard = appState.getCardsFromAdvSearch()[arg2];
-                                CardCarouselFragment fragment = new CardCarouselFragment();
-                                Bundle args = new Bundle();
-                                args.putBoolean("FROM ADV SEARCH", true);
-                                args.putInt("CURRENT ITEM", arg2);
-                                fragment.setArguments(args);
+                                CardList.selectedCard = cardsFromSearch[arg2];
+                                CardCarouselFragment fragment =  CardCarouselFragment.newInstance(cardsFromSearch, true, false);
                                 getFragmentManager().beginTransaction()
                                         .replace(id.content_frame, fragment)
                                         .commit();

@@ -1,16 +1,13 @@
 package com.zach.wilson.magic.app.fragments;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import com.zach.wilson.magic.app.MainActivity;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 import com.zach.wilson.magic.app.adapters.MyArrayAdapter;
-import com.zach.wilson.magic.app.helpers.MagicAppSettings;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
-import com.zach.wilson.magic.app.models.Price;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -35,11 +32,9 @@ public class SearchFragment extends Fragment {
 	public ListView list;
 	Context context;
 	Fragment fragment;
-	Card[] potentialCards;
 	ArrayList<String> imageURLs;
 	String searchString;
 	View view;
-	MagicAppSettings appState;
 	public SearchFragment() {
 	}
 
@@ -47,7 +42,6 @@ public class SearchFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(layout.listview, null, false);
-		appState = (MagicAppSettings) getActivity().getApplication();
 		context = v.getContext();
 		list = (ListView) v.findViewById(id.listing);
 		adapter = new MyArrayAdapter(context, layout.listitem, potentialNames);
@@ -69,7 +63,6 @@ public class SearchFragment extends Fragment {
 				String viewURL = imageURLs.get(x);
 
 				
-				appState.setCardFromSearch(CardList.currentCardList.get(x));
 				MainActivity activity = (MainActivity) getActivity();
 
 				
@@ -79,17 +72,13 @@ public class SearchFragment extends Fragment {
 						.getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus()
 						.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-
-				CardCarouselFragment fragment = new CardCarouselFragment();
-				Bundle args = new Bundle();
-				args.putBoolean("FROM SEARCH", true);
-				fragment.setArguments(args);
+                Card[] temp = new Card[1];
+                temp[0] = CardList.currentCardList.get(x);
+				CardCarouselFragment fragment = CardCarouselFragment.newInstance(temp, false, true);
 				adapter.clear();
 				adapter.notifyDataSetChanged();
-				Log.i("ISHIDDEN", String.valueOf(isHidden()));
 				getFragmentManager().beginTransaction()
 						.replace(id.content_frame, fragment).commit();
-				Log.i("ISHIDDEN", String.valueOf(isHidden()));
 
 			}
 

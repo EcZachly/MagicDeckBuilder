@@ -9,10 +9,12 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.zach.wilson.magic.app.R;
+import com.zach.wilson.magic.app.fragments.PlaneschaseFragment;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.Edition;
 
 import android.content.Context;
+import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,10 +30,8 @@ public class ImageAdapterPlaneschase extends BaseAdapter{
 	String[] imageUrls;
 	ImageLoader imageLoader;
 	LayoutInflater inflater;
-	
-	
-	
-	
+
+
 	private ArrayList<Edition> cardEditions;
 	private Card card;
 	
@@ -58,13 +58,12 @@ public class ImageAdapterPlaneschase extends BaseAdapter{
 		cardEditions = new ArrayList<Edition>();
 		for(int i = 0; i < card.getEditions().length; i++){
 			Edition e = card.getEditions()[i];
-		
-			
+
 		if(e.getSet().startsWith("Vintage") || e.getSet().startsWith("Masters") || e.getSet().startsWith("Duels of the Planeswalkers")){
-			Log.i("SETV", e.getSet());
+			//Log.i("SETV", e.getSet());
 		}
 		else{
-			Log.i("SET", e.getSet());
+			//Log.i("SET", e.getSet());
 			cardEditions.add(e);
 		}
 		
@@ -120,8 +119,9 @@ public class ImageAdapterPlaneschase extends BaseAdapter{
 						message = "Downloads are denied";
 						break;
 					case OUT_OF_MEMORY:
-						message = "Out Of Memory error";
-						break;
+
+
+                        break;
 					case UNKNOWN:
 						message = "Unknown error";
 						break;
