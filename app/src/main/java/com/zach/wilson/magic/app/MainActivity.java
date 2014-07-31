@@ -159,7 +159,7 @@ public class MainActivity extends FragmentActivity implements
 
 
 
-        //setUpTintBar();
+        setUpTintBar();
         if (getFragmentManager().findFragmentByTag("PLANESCHASEFRAGMENT") == null) {
             Random ra = new Random();
             int za = ra.nextInt(140);
@@ -491,25 +491,25 @@ public class MainActivity extends FragmentActivity implements
                     break;
 
                     }
-                });
-            case 7:
-                this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                if (mycartFragment == null) {
-                    mycartFragment = new DiscoveryFragment();
-                }
-                f = fragmentManager.findFragmentByTag("CardCarousel");
-                if (f != null) {
-                    fragmentManager.beginTransaction().remove(f).commit();
-                }
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, mycartFragment).commit();
-                currentFragment = mycartFragment;
 
-
-                break;
-
-
-        }
+//            case 7:
+//                this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//                if (mycartFragment == null) {
+//                    mycartFragment = new DiscoveryFragment();
+//                }
+//                f = fragmentManager.findFragmentByTag("CardCarousel");
+//                if (f != null) {
+//                    fragmentManager.beginTransaction().remove(f).commit();
+//                }
+//                fragmentManager.beginTransaction()
+//                        .replace(R.id.content_frame, mycartFragment).commit();
+//                currentFragment = mycartFragment;
+//
+//
+//                break;
+//
+//
+//        }
         mDrawerLayout.closeDrawers();
         mDrawerLayout.closeDrawer(mDrawerList);
     }

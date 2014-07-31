@@ -14,13 +14,13 @@
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/blackmanaicon"
-
+        android:theme="@style/Theme.Example"
         android:label="@string/app_name" >
 
 
         <activity
             android:name="MainActivity"
-
+            android:theme="@style/Theme.Example"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             >

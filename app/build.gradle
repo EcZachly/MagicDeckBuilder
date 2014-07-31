@@ -12,14 +12,14 @@ android {
     signingConfigs {
         release {
             // We can leave these in environment variables
-         // storeFile file("C:\\Users\\Zach\\Desktop\\MagicAppKeystore\\MagicApp.apk")
+          storeFile file("C:\\Users\\Zach\\Desktop\\MagicAppKeystore\\MagicApp.apk")
             keyAlias "magic app"
 
             // These two lines make gradle believe that the signingConfigs
             // section is complete. Without them, tasks like installRelease
             // will not be available!
-            storePassword "notYourRealPassword"
-            keyPassword "notYourRealPassword"
+            storePassword "1147798"
+            keyPassword "1147798"
         }
     }
     buildTypes {
