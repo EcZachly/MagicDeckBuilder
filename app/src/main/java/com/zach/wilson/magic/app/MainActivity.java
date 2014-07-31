@@ -41,6 +41,7 @@ import com.zach.wilson.magic.app.fragments.AddDeckFragment;
 import com.zach.wilson.magic.app.fragments.AdvancedSearchFragment;
 import com.zach.wilson.magic.app.fragments.ArchenemyFragment;
 import com.zach.wilson.magic.app.fragments.CardCarouselFragment;
+import com.zach.wilson.magic.app.fragments.DiscoveryFragment;
 import com.zach.wilson.magic.app.fragments.LifeCounterFragment;
 import com.zach.wilson.magic.app.fragments.MyCartFragment;
 import com.zach.wilson.magic.app.fragments.MyDeckFragment;
@@ -488,6 +489,24 @@ public class MainActivity extends FragmentActivity implements
                         }
                     });
                     break;
+
+                    }
+                });
+            case 7:
+                this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                if (mycartFragment == null) {
+                    mycartFragment = new DiscoveryFragment();
+                }
+                f = fragmentManager.findFragmentByTag("CardCarousel");
+                if (f != null) {
+                    fragmentManager.beginTransaction().remove(f).commit();
+                }
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, mycartFragment).commit();
+                currentFragment = mycartFragment;
+
+
+                break;
 
 
         }
