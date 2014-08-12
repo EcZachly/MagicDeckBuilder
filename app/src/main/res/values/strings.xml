@@ -46,6 +46,11 @@
     <string name="drawer_open">Magic: Deck Builder</string>
     <string name="drawer_close">Magic: Deck Builder</string>
     <string name="hello_world">Hello world!</string>
+    <string name="apply">Apply Filter</string>
+    <string name="filter_by_set">Filter by Set</string>
+    <string name="filter_by_type">Filter by Type</string>
+    <string name="filter_by_tournament">Filter by Tournament</string>
+
 
     <string-array name="operating_systems">
         <item>Home</item>
