@@ -1,11 +1,14 @@
 package com.zach.wilson.magic.app.fragments;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -17,7 +20,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -30,6 +38,7 @@ import com.zach.wilson.magic.app.helpers.PriceDialog;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.Products;
+import com.zach.wilson.magic.app.models.Set;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -50,6 +59,14 @@ public class CardCarouselFragment extends Fragment {
     PriceDialog pricing;
     ProgressDialog loading;
 
+    static LinearLayout filtering;
+    static Spinner set;
+    static Spinner type;
+    static Spinner tournament;
+    static Spinner[] spinners = new Spinner[3];
+    static String[] formats = {"", "Standard", "Modern", "Vintage", "Legacy",
+            "Commander"};
+    static List<Set> allSets;
 	@Override
 	public View onCreateView(final LayoutInflater inflater,
 			ViewGroup container, Bundle savedInstanceState) {
@@ -66,6 +83,159 @@ public class CardCarouselFragment extends Fragment {
 
 		View v = inflater.inflate(R.layout.pagerlayout, null);
         loading = new ProgressDialog(v.getContext());
+        filtering = (LinearLayout) v.findViewById(R.id.filterLayout);
+        context = v.getContext();
+        set = (Spinner) filtering.findViewById(R.id.filterBySet);
+        type = (Spinner) filtering.findViewById(R.id.filterByType);
+        tournament = (Spinner) filtering.findViewById(R.id.filterByTournamentLegality);
+        spinners[0] =set;
+        spinners[1] = type;
+        spinners[2] = tournament;
+        DeckBrewClient.getAPI();
+
+
+        for(Spinner s : spinners){
+
+
+            s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+
+
+        }
+        Button b = (Button) filtering.findViewById(R.id.applyFilters);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DeckBrewClient.getAPI();
+                ArrayList ty = new ArrayList<String>();
+                ArrayList to = new ArrayList<String>();
+                ArrayList set = new ArrayList<String>();
+                String selectedS =  spinners[0].getSelectedItem().toString();
+                for(Set s : CardCarouselFragment.getSets()){
+                    if(s.getName().equals(selectedS)){
+                        set.add(s.getId());
+                        break;
+                    }
+                }
+
+                if(!spinners[1].getSelectedItem().toString().equals(""))
+                    ty.add(spinners[1].getSelectedItem().toString().toLowerCase());
+                if(!spinners[2].getSelectedItem().toString().equals(""))
+                    to.add(spinners[2].getSelectedItem().toString().toLowerCase());
+
+                loading.setMessage("Getting cards");
+                loading.show();
+                DeckBrewClient.deckbrew.getCardsFromFilters(set, ty, to, new Callback<List<Card>>(){
+
+                    @Override
+                    public void success(List<Card> cards, Response response) {
+
+                        loading.dismiss();
+                        loading.setMessage("Getting prices");
+                        Log.i("CARDS", String.valueOf(cards.size()));
+
+                        Bundle args = new Bundle();
+                        Card[] c = new Card[cards.size()];
+                        for(int i = 0; i < c.length; i++){
+                            c[i] = cards.get(i);
+                        }
+                        args.putSerializable("CARDS FROM MAIN", c);
+
+                        CardCarouselFragment f = CardCarouselFragment.newInstance(c, true, false);
+                        getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+                        TCGClient.instantiate();
+                        CardCarouselFragment.getFilterLayout().setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        loading.dismiss();
+                        Log.i("FAILURE FROM GCARDS", error.getMessage());
+                        Log.i("FAILURE FROM GCARDS", error.getUrl());
+                    }
+                });
+
+
+
+
+            }
+        });
+
+
+
+
+        DeckBrewClient.deckbrew.getSets(new Callback<List<Set>>(){
+
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+
+            @Override
+            public void success(List<Set> sets, Response response) {
+                    ArrayList<String> temp = new ArrayList<String>();
+                    allSets = new ArrayList<Set>();
+                for(Set s : sets){
+                    temp.add(s.getName());
+                    allSets.add(s);
+                }
+                String[] temp1 = new String[temp.size() + 1];
+                temp1[0] = " ";
+                for(int i = 1; i < temp1.length; i++){
+                    temp1[i] = temp.get(i - 1);
+                }
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, temp1); //selected item will look like a spinner set from XML
+                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                set.setAdapter(spinnerArrayAdapter);
+            }
+        });
+
+        DeckBrewClient.deckbrew.getTypes(new Callback<List<String>>(){
+
+            @Override
+            public void success(List<String> strings, Response response) {
+                String[] t = new String[strings.size() + 1];
+                t[0] = "";
+                for(int i = 1; i < t.length ; i++){
+                    String temp = strings.get(i - 1);
+                    char a = temp.charAt(0);
+                    temp = temp.substring(1);
+
+                    a = Character.toUpperCase(a);
+
+                    temp = a + temp;
+
+                    t[i] = temp;
+                }
+
+
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, t); //selected item will look like a spinner set from XML
+                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                type.setAdapter(spinnerArrayAdapter);
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, formats); //selected item will look like a spinner set from XML
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tournament.setAdapter(spinnerArrayAdapter);
+
+
         loading.setMessage("Getting prices");
 		pager = (JazzyViewPager) v.findViewById(R.id.pager);
 
@@ -221,6 +391,21 @@ public class CardCarouselFragment extends Fragment {
         args.putBoolean("search", fSearch);
         f.setArguments(args);
         return f;
+    }
+
+    public static LinearLayout getFilterLayout(){
+        return filtering;
+    }
+
+    public static Spinner[] getSpinners(){
+        Spinner[] spinners = new Spinner[3];
+        spinners[0] = set;
+        spinners[1] = type;
+        spinners[2] = tournament;
+        return spinners;
+    }
+    public static List<Set> getSets(){
+        return allSets;
     }
 
 }

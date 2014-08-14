@@ -22,12 +22,16 @@ import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.AdapterView;
 
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.Spinner;
 
 
 import com.flurry.android.FlurryAgent;
@@ -52,6 +56,7 @@ import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
+import com.zach.wilson.magic.app.models.Set;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +88,7 @@ public class MainActivity extends FragmentActivity implements
     Fragment lifeCounterFragment;
     LinearLayout rightDrawer;
     Context context;
+    MenuItem lifeCounter;
     @Override
     protected void onStop() {
         FlurryAgent.onEndSession(this);
@@ -230,24 +236,26 @@ public class MainActivity extends FragmentActivity implements
 
         searchView = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
-        MenuItem lifeCounter =  menu
-                .findItem(R.id.lifeCounterActionBar);
+         lifeCounter =  menu
+                .findItem(R.id.filteringActionBar);
+
+
         lifeCounter.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (lifeCounterFragment == null) {
-                    lifeCounterFragment = new LifeCounterFragment();
+                if(CardCarouselFragment.getFilterLayout().getVisibility() == View.GONE) {
+
+                  expand( CardCarouselFragment.getFilterLayout());
+
+
+
                 }
-                FragmentManager fragmentManager = getFragmentManager();
-                Fragment f;
-                f = fragmentManager.findFragmentByTag("CardCarousel");
-                if (f != null) {
-                    fragmentManager.beginTransaction().remove(f).commit();
+                else {
+                  collapse(CardCarouselFragment.getFilterLayout());
                 }
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, lifeCounterFragment, "LIFECOUNTERFRAGMENT")
-                        .commit();
+
+
                 return false;
             }
 
@@ -301,6 +309,7 @@ public class MainActivity extends FragmentActivity implements
                         @Override
                         public void success(List<Card> cards, Response response) {
                                 searchingFragment = new SearchFragment();
+                            lifeCounter.setVisible(false);
                             Bundle args = new Bundle();
                             CardList.currentCardList = new ArrayList<Card>();
                             ArrayList<String>names = new ArrayList<String>();
@@ -382,7 +391,7 @@ public class MainActivity extends FragmentActivity implements
                     fragmentManager.beginTransaction().remove(f).commit();
 
                 }
-
+                lifeCounter.setVisible(false);
                 fragmentManager.beginTransaction()
                         .replace(R.id.content_frame, archenemyFragment, "ARCHENEMYFRAGMENT").commit();
                 currentFragment = archenemyFragment;
@@ -390,7 +399,7 @@ public class MainActivity extends FragmentActivity implements
                 break;
             case 4:
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+                lifeCounter.setVisible(false);
                 if (mydeckFragment == null) {
                     mydeckFragment = new MyDeckFragment();
                 }
@@ -407,7 +416,7 @@ public class MainActivity extends FragmentActivity implements
                 break;
             case 6:
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+                lifeCounter.setVisible(false);
                 if (advancedSearchFragment == null) {
                     advancedSearchFragment = AdvancedSearchFragment.newInstance();
                 }
@@ -419,7 +428,7 @@ public class MainActivity extends FragmentActivity implements
                 break;
             case 2:
 
-
+                lifeCounter.setVisible(false);
                 if (planesChaseFragment == null) {
                     planesChaseFragment = new PlaneschaseFragment();
 
@@ -438,7 +447,7 @@ public class MainActivity extends FragmentActivity implements
                 break;
             case 1:
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+                lifeCounter.setVisible(false);
                 if (lifeCounterFragment == null) {
                     lifeCounterFragment = new LifeCounterFragment();
                 }
@@ -452,6 +461,7 @@ public class MainActivity extends FragmentActivity implements
 
                 break;
             case 5:
+                lifeCounter.setVisible(false);
                 this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 if (mycartFragment == null) {
                     mycartFragment = new MyCartFragment();
@@ -467,7 +477,7 @@ public class MainActivity extends FragmentActivity implements
 
                 break;
             case 0:
-
+                    lifeCounter.setVisible(true);
 
                     Random r = new Random();
                     String z = CardList.allCards + r.nextInt(140);
@@ -545,4 +555,57 @@ public class MainActivity extends FragmentActivity implements
         return searchView;
     }
 
+
+    public static void expand(final View v) {
+        v.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        final int targtetHeight = v.getMeasuredHeight();
+
+        v.getLayoutParams().height = 0;
+        v.setVisibility(View.VISIBLE);
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? ViewGroup.LayoutParams.WRAP_CONTENT
+                        : (int)(targtetHeight * interpolatedTime);
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(targtetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
+
+    public static void collapse(final View v) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if(interpolatedTime == 1){
+                    v.setVisibility(View.GONE);
+                }else{
+                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    v.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
 }

@@ -5,6 +5,13 @@
     android:background="@drawable/finalprojectpicture2"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
+    <include
+        android:id="@+id/filterLayout"
+        layout="@layout/filtrationlayout"
+       />
+
+
+
     <!-- android:background="@drawable/finalprojectpicture2" -->
     <com.zach.wilson.magic.app.helpers.JazzyViewPager
         android:id="@+id/pager"

@@ -6,8 +6,8 @@
         android:showAsAction="always"
         android:title="My Cart"/>
     <item
-        android:id="@+id/lifeCounterActionBar"
-        android:icon="@drawable/hearticon"
+        android:id="@+id/filteringActionBar"
+        android:icon="@drawable/filter"
         android:showAsAction="always"
         android:title="Life Counter"/>
     <item

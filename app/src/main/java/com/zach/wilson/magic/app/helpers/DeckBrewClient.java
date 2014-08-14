@@ -1,6 +1,7 @@
 package com.zach.wilson.magic.app.helpers;
 
 import com.zach.wilson.magic.app.models.Card;
+import com.zach.wilson.magic.app.models.Set;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,14 @@ public class DeckBrewClient {
         @GET("/mtg/cards/typeahead")
         void getCardsFromStart(@Query("q") String temp, Callback<List<Card>> card);
 
+
+
+        @GET("/mtg/subtypes")
+        void getTypes(Callback<List<String>> types);
+
+        @GET("/mtg/sets")
+        void getSets(Callback<List<Set>> sets);
+
         @GET("/mtg/cards")
         void getCardsFromAttributes(@QueryMap Map<String, String> map, Callback<List<Card>> cards);
 
@@ -36,6 +45,13 @@ public class DeckBrewClient {
                 @Query("format") List<String> format,
                 @Query("rarity") List<String> rarity,
                 @Query("multicolor") boolean multi,
+                Callback<List<Card>> card);
+
+        @GET("/mtg/cards")
+        void getCardsFromFilters(
+                @Query("set") List<String> set,
+                @Query("subtype") List<String> subtypes,
+                @Query("format") List<String> format,
                 Callback<List<Card>> card);
 
 
