@@ -11,4 +11,5 @@
 	<color name="dark_gray">#323232</color>
 	<color name="line_break_gray">#DADADC</color>
     <color name="black">#050505</color>
+    <color name="gray_action">#EBEBEB</color>
 </resources>

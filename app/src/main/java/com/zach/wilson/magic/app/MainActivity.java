@@ -200,7 +200,7 @@ public class MainActivity extends FragmentActivity implements
             SystemBarTintManager.SystemBarConfig config = tintManager.getConfig();
             findViewById(android.R.id.content).setPadding(0, config.getPixelInsetTop(true), config.getPixelInsetRight(), config.getPixelInsetBottom());
         }
-        tintManager.setTintColor(getResources().getColor(R.color.black));
+        tintManager.setTintColor(getResources().getColor(R.color.gray_action));
     }
     private class DrawerItemClickListener implements
             ListView.OnItemClickListener {

@@ -27,7 +27,7 @@ public class DeckBrewClient {
 
 
 
-        @GET("/mtg/subtypes")
+        @GET("/mtg/types")
         void getTypes(Callback<List<String>> types);
 
         @GET("/mtg/sets")
@@ -50,7 +50,7 @@ public class DeckBrewClient {
         @GET("/mtg/cards")
         void getCardsFromFilters(
                 @Query("set") List<String> set,
-                @Query("subtype") List<String> subtypes,
+                @Query("type") List<String> subtypes,
                 @Query("format") List<String> format,
                 Callback<List<Card>> card);
 
