@@ -1,6 +1,7 @@
 package com.zach.wilson.magic.app.models;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
@@ -10,44 +11,25 @@ import com.google.gson.annotations.SerializedName;
  * Created by jakewilson on 7/25/14.
  */
 
-public class Deck {
-    @SerializedName("user_display")
-    @Expose
-    private String userDisplay;
-    @Expose
-    private String name;
-    @Expose
-    private String url;
-    @SerializedName("featured_card")
-    @Expose
-    private String featuredCard;
-    @SerializedName("date_updated")
-    @Expose
-    private Integer dateUpdated;
-    @Expose
-    private Integer score;
-    @Expose
-    private List<List<String>> inventory = new ArrayList<List<String>>();
-    @SerializedName("resource_uri")
-    @Expose
-    private String resourceUri;
-    @SerializedName("thumbnail_url")
-    @Expose
-    private String thumbnailUrl;
-    @Expose
-    private String slug;
-    @SerializedName("small_thumbnail_url")
-    @Expose
-    private String smallThumbnailUrl;
-    @Expose
-    private String user;
+public class Deck implements Serializable {
 
-    public String getUserDisplay() {
-        return userDisplay;
+
+
+    Card[] mainBoard;
+    Card[] sideBoard;
+    String name;
+    String creator;
+    String format;
+
+    public Card[] getMainBoard() {
+        return mainBoard;
     }
 
-    public void setUserDisplay(String userDisplay) {
-        this.userDisplay = userDisplay;
+    public void setMainBoard(Card[] mainBoard) {
+        this.mainBoard = new Card[mainBoard.length];
+        for(int i = 0; i < mainBoard.length; i++){
+            this.mainBoard[i] = mainBoard[i];
+        }
     }
 
     public String getName() {
@@ -58,84 +40,30 @@ public class Deck {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
+    public String getFormat() {
+        return format;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setFormat(String format) {
+        this.format = format;
     }
 
-    public String getFeaturedCard() {
-        return featuredCard;
+    public String getCreator() {
+        return creator;
     }
 
-    public void setFeaturedCard(String featuredCard) {
-        this.featuredCard = featuredCard;
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
-    public Integer getDateUpdated() {
-        return dateUpdated;
+    public Card[] getSideBoard() {
+        return sideBoard;
     }
 
-    public void setDateUpdated(Integer dateUpdated) {
-        this.dateUpdated = dateUpdated;
+    public void setSideBoard(Card[] sideBoard) {
+        this.sideBoard = new Card[sideBoard.length];
+        for(int i = 0; i < sideBoard.length; i++){
+            this.sideBoard[i] = sideBoard[i];
+        }
     }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    public List<List<String>> getInventory() {
-        return inventory;
-    }
-
-    public void setInventory(List<List<String>> inventory) {
-        this.inventory = inventory;
-    }
-
-    public String getResourceUri() {
-        return resourceUri;
-    }
-
-    public void setResourceUri(String resourceUri) {
-        this.resourceUri = resourceUri;
-    }
-
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
-    }
-
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
-    }
-
-    public String getSlug() {
-        return slug;
-    }
-
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
-
-    public String getSmallThumbnailUrl() {
-        return smallThumbnailUrl;
-    }
-
-    public void setSmallThumbnailUrl(String smallThumbnailUrl) {
-        this.smallThumbnailUrl = smallThumbnailUrl;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
 }

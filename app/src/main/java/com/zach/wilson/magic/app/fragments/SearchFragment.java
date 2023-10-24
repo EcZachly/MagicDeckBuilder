@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.zach.wilson.magic.app.MainActivity;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
+import com.zach.wilson.magic.app.SearchActivity;
 import com.zach.wilson.magic.app.adapters.MyArrayAdapter;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
@@ -28,7 +29,6 @@ public class SearchFragment extends Fragment {
 	public ArrayList<String> potentialNames;
 	ArrayAdapter<String> adapter;
 	LayoutInflater inflater;
-	LinearLayout searchlayout;
 	public ListView list;
 	Context context;
 	Fragment fragment;
@@ -41,33 +41,22 @@ public class SearchFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(layout.listview, null, false);
+		View v = inflater.inflate(layout.listview, null);
 		context = v.getContext();
 		list = (ListView) v.findViewById(id.listing);
 		adapter = new MyArrayAdapter(context, layout.listitem, potentialNames);
 		list.setAdapter(adapter);
 		Log.i("ID", String.valueOf(this.getId()));
 		Log.i("CONTEXT", String.valueOf(context));
-		searchlayout = (LinearLayout) v.findViewById(id.searchLayout);
 		list.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int x,
 					long arg3) {
 			
-				SearchView searchView = ((MainActivity) getActivity())
-						.getSearchView();
-				
 
-				String c = adapter.getItem(x);
-				String viewURL = imageURLs.get(x);
-
-				
-				MainActivity activity = (MainActivity) getActivity();
-
-				
-				((MainActivity) getActivity()).getSearchView().setIconified(true);
-				((MainActivity) getActivity()).getSearchView().clearFocus();
+				((SearchActivity) getActivity()).getSearch().setIconified(true);
+				((SearchActivity) getActivity()).getSearch().clearFocus();
 				InputMethodManager inputManager = (InputMethodManager) getActivity()
 						.getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus()

@@ -58,11 +58,11 @@ public class ItemDetailFragment extends Fragment {
 		View rootView = inflater.inflate(layout.fragment_item_detail,
 				container, false);
 
-		// Show the dummy content as text in a TextView.
-		if (mItem != null) {
-			((TextView) rootView.findViewById(id.item_detail))
-					.setText(mItem.content);
-		}
+//		// Show the dummy content as text in a TextView.
+//		if (mItem != null) {
+//			((TextView) rootView.findViewById(id.item_detail))
+//					.setText(mItem.content);
+//		}
 
 		return rootView;
 	}

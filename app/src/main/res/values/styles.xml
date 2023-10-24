@@ -3,6 +3,7 @@
         <!-- Base application theme. android:Theme.Holo.Light.DarkActionBar-->
         <style name="AppTheme" parent="android:Theme.Holo.Light">
             <item name="android:actionBarStyle">@style/MyActionBar</item>
+
         </style>
         <!-- ActionBar styles -->
         <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">

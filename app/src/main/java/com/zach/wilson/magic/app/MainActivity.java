@@ -6,7 +6,9 @@ import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 
 import android.os.AsyncTask;
@@ -16,6 +18,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,6 +38,7 @@ import android.widget.Spinner;
 
 
 import com.flurry.android.FlurryAgent;
+import com.google.gson.Gson;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -56,8 +60,13 @@ import com.zach.wilson.magic.app.helpers.DeckBrewClient;
 import com.zach.wilson.magic.app.helpers.TCGClient;
 import com.zach.wilson.magic.app.models.Card;
 import com.zach.wilson.magic.app.models.CardList;
+import com.zach.wilson.magic.app.models.Deck;
 import com.zach.wilson.magic.app.models.Set;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -88,7 +97,9 @@ public class MainActivity extends FragmentActivity implements
     Fragment lifeCounterFragment;
     LinearLayout rightDrawer;
     Context context;
+    Deck[] decks;
     MenuItem lifeCounter;
+
     @Override
     protected void onStop() {
         FlurryAgent.onEndSession(this);
@@ -100,7 +111,6 @@ public class MainActivity extends FragmentActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
 
         FlurryAgent.onStartSession(this, "4P837N5N2QZSC2BGC3V3");
@@ -148,6 +158,7 @@ public class MainActivity extends FragmentActivity implements
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
             }
+
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 getActionBar().setTitle(title);
@@ -162,7 +173,6 @@ public class MainActivity extends FragmentActivity implements
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
-
 
 
         setUpTintBar();
@@ -184,24 +194,24 @@ public class MainActivity extends FragmentActivity implements
 
             });
 
-        }
-        else{
+        } else {
             PlaneschaseFragment f = (PlaneschaseFragment) getFragmentManager().findFragmentByTag("PLANESCHASEFRAGMENT");
 
             getFragmentManager().beginTransaction().replace(R.id.content_frame, f, "PLANESCHASEFRAGMENT").commit();
         }
     }
 
-    public void setUpTintBar(){
+    public void setUpTintBar() {
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setNavigationBarTintEnabled(true);
-        if(Build.VERSION.SDK_INT >= 19){
+        if (Build.VERSION.SDK_INT >= 19) {
             SystemBarTintManager.SystemBarConfig config = tintManager.getConfig();
             findViewById(android.R.id.content).setPadding(0, config.getPixelInsetTop(true), config.getPixelInsetRight(), config.getPixelInsetBottom());
         }
         tintManager.setTintColor(getResources().getColor(R.color.gray_action));
     }
+
     private class DrawerItemClickListener implements
             ListView.OnItemClickListener {
 
@@ -236,7 +246,7 @@ public class MainActivity extends FragmentActivity implements
 
         searchView = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
-         lifeCounter =  menu
+        lifeCounter = menu
                 .findItem(R.id.filteringActionBar);
 
 
@@ -244,15 +254,13 @@ public class MainActivity extends FragmentActivity implements
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if(CardCarouselFragment.getFilterLayout().getVisibility() == View.GONE) {
+                if (CardCarouselFragment.getFilterLayout().getVisibility() == View.GONE) {
 
-                  expand( CardCarouselFragment.getFilterLayout());
+                    expand(CardCarouselFragment.getFilterLayout());
 
 
-
-                }
-                else {
-                  collapse(CardCarouselFragment.getFilterLayout());
+                } else {
+                    collapse(CardCarouselFragment.getFilterLayout());
                 }
 
 
@@ -288,11 +296,15 @@ public class MainActivity extends FragmentActivity implements
 
             @Override
             public void onClick(View v) {
-                searchFragment = new SearchFragment();
-                Bundle args = new Bundle();
-                searchFragment.setArguments(args);
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.content_frame, searchFragment, "SEARCHFRAGMENT").commit();
+               Intent t = new Intent(context, SearchActivity.class);
+                startActivity(t);
+                searchView.setIconified(true);
+
+//                searchFragment = new SearchFragment();
+//                Bundle args = new Bundle();
+//                searchFragment.setArguments(args);
+//                getFragmentManager().beginTransaction()
+//                        .replace(R.id.content_frame, searchFragment, "SEARCHFRAGMENT").commit();
 
             }
 
@@ -303,16 +315,16 @@ public class MainActivity extends FragmentActivity implements
             public boolean onQueryTextChange(String newText) {
 
                 if (newText.length() > 0) {
-                 DeckBrewClient.getAPI();
-                    DeckBrewClient.deckbrew.getCardsFromStart(newText, new Callback<List<Card>>(){
+                    DeckBrewClient.getAPI();
+                    DeckBrewClient.deckbrew.getCardsFromStart(newText, new Callback<List<Card>>() {
 
                         @Override
                         public void success(List<Card> cards, Response response) {
-                                searchingFragment = new SearchFragment();
+                            searchingFragment = new SearchFragment();
                             lifeCounter.setVisible(false);
                             Bundle args = new Bundle();
                             CardList.currentCardList = new ArrayList<Card>();
-                            ArrayList<String>names = new ArrayList<String>();
+                            ArrayList<String> names = new ArrayList<String>();
                             ArrayList<String> URLS = new ArrayList<String>();
                             for (int i = 0; i < cards.size(); i++) {
                                 names.add(cards.get(i).getName());
@@ -331,7 +343,6 @@ public class MainActivity extends FragmentActivity implements
 
                         }
                     });
-
 
 
                 } else {
@@ -477,49 +488,62 @@ public class MainActivity extends FragmentActivity implements
 
                 break;
             case 0:
-                    lifeCounter.setVisible(true);
+                lifeCounter.setVisible(true);
 
-                    Random r = new Random();
-                    String z = CardList.allCards + r.nextInt(140);
-                    DeckBrewClient.getAPI().getRandomCards(r.nextInt(140), new Callback<Card[]>() {
-                        @Override
-                        public void success(Card[] cards, Response response) {
-                            Bundle args = new Bundle();
-                            args.putSerializable("CARDS FROM MAIN", cards);
-                            CardCarouselFragment f = CardCarouselFragment.newInstance(cards, false, false);
-                            getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
-                            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                            TCGClient.instantiate();
-
-                        }
-
-                        @Override
-                        public void failure(RetrofitError error) {
-
-                        }
-                    });
-                    break;
+                Random r = new Random();
+                String z = CardList.allCards + r.nextInt(140);
+                DeckBrewClient.getAPI().getRandomCards(r.nextInt(140), new Callback<Card[]>() {
+                    @Override
+                    public void success(Card[] cards, Response response) {
+                        Bundle args = new Bundle();
+                        args.putSerializable("CARDS FROM MAIN", cards);
+                        CardCarouselFragment f = CardCarouselFragment.newInstance(cards, false, false);
+                        getFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        TCGClient.instantiate();
 
                     }
 
-//            case 7:
-//                this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//                if (mycartFragment == null) {
-//                    mycartFragment = new DiscoveryFragment();
-//                }
-//                f = fragmentManager.findFragmentByTag("CardCarousel");
-//                if (f != null) {
-//                    fragmentManager.beginTransaction().remove(f).commit();
-//                }
-//                fragmentManager.beginTransaction()
-//                        .replace(R.id.content_frame, mycartFragment).commit();
-//                currentFragment = mycartFragment;
-//
-//
-//                break;
-//
-//
-//        }
+                    @Override
+                    public void failure(RetrofitError error) {
+
+                    }
+                });
+                break;
+
+
+            case 7:
+                this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                new AsyncTask<String, String, String>() {
+
+
+                    @Override
+                    protected String doInBackground(String... strings) {
+                       decks =  readInDecks().get(0);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String s) {
+                        Fragment f;
+                        if (mycartFragment == null) {
+                            mycartFragment = DiscoveryFragment.newInstance(decks, "BLANK");
+                        }
+                        f = getFragmentManager().findFragmentByTag("CardCarousel");
+                        if (f != null) {
+                            getFragmentManager().beginTransaction().remove(f).commit();
+                        }
+                        getFragmentManager().beginTransaction()
+                                .replace(R.id.content_frame, mycartFragment).commit();
+                        currentFragment = mycartFragment;
+                    }
+                }.execute("");
+
+
+                break;
+
+
+        }
         mDrawerLayout.closeDrawers();
         mDrawerLayout.closeDrawer(mDrawerList);
     }
@@ -544,11 +568,11 @@ public class MainActivity extends FragmentActivity implements
     public void onRssItemSelected(String link) {
 
     }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         //No call for super(). Bug on API Level > 11.
     }
-
 
 
     public SearchView getSearchView() {
@@ -562,13 +586,12 @@ public class MainActivity extends FragmentActivity implements
 
         v.getLayoutParams().height = 0;
         v.setVisibility(View.VISIBLE);
-        Animation a = new Animation()
-        {
+        Animation a = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 v.getLayoutParams().height = interpolatedTime == 1
                         ? ViewGroup.LayoutParams.WRAP_CONTENT
-                        : (int)(targtetHeight * interpolatedTime);
+                        : (int) (targtetHeight * interpolatedTime);
                 v.requestLayout();
             }
 
@@ -579,21 +602,20 @@ public class MainActivity extends FragmentActivity implements
         };
 
         // 1dp/ms
-        a.setDuration((int)(targtetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        a.setDuration((int) (targtetHeight / v.getContext().getResources().getDisplayMetrics().density));
         v.startAnimation(a);
     }
 
     public static void collapse(final View v) {
         final int initialHeight = v.getMeasuredHeight();
 
-        Animation a = new Animation()
-        {
+        Animation a = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
+                if (interpolatedTime == 1) {
                     v.setVisibility(View.GONE);
-                }else{
-                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                } else {
+                    v.getLayoutParams().height = initialHeight - (int) (initialHeight * interpolatedTime);
                     v.requestLayout();
                 }
             }
@@ -605,7 +627,31 @@ public class MainActivity extends FragmentActivity implements
         };
 
         // 1dp/ms
-        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+        a.setDuration((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density));
         v.startAnimation(a);
     }
+
+
+    public ArrayList<Deck[]> readInDecks() {
+        ArrayList<Deck[]> decks = new ArrayList<Deck[]>();
+        Gson gson = new Gson();
+        try {
+            AssetManager as = getAssets();
+
+         InputStream is = as.open("cards.txt");
+
+                String temp = IOUtils.toString(is);
+                decks.add(gson.fromJson(temp, Deck[].class));
+        } catch (IOException e) {
+            Log.i("ERROR", e.getMessage());
+            Log.i("ERROR", e.getStackTrace().toString());
+
+
+        }
+
+        return  decks;
+    }
+
+
+
 }

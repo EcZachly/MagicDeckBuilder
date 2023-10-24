@@ -20,6 +20,8 @@
         android:layout_weight="1"
         android:src="@drawable/garbagecanicon2" />
 
+
+
     <ImageView
         android:id="@+id/deckShare"
         android:layout_width="0dp"

@@ -12,4 +12,5 @@
 	<color name="line_break_gray">#DADADC</color>
     <color name="black">#050505</color>
     <color name="gray_action">#EBEBEB</color>
+    <color name="app_red">#CC0000</color>
 </resources>

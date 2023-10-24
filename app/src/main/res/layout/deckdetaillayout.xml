@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawerLayoutForCards"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+        <ListView
+            android:id="@+id/myDeckLists"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <ListView
+            android:id="@+id/mySideBoard"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/rightDrawerLayout"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@android:color/white"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        android:weightSum="1"
+        >
+
+        <com.zach.wilson.magic.app.helpers.JazzyViewPager
+            android:id="@+id/card_pager"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".9" />
+
+        <include
+            android:layout_height="0dp"
+            android:layout_weight=".05"
+            layout="@layout/pricedialog" />
+
+
+    </LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>

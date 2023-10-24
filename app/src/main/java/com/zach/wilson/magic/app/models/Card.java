@@ -12,9 +12,23 @@ public class Card implements Serializable, Comparable<Card> {
 	private static final long serialVersionUID = 1L;
 
 
-	
+
+    private String quantity = "1";
 	private Edition[] editions;
-	private Format formats;
+
+    public String getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    private Format formats;
 	private String name;
 	private String cmc;
 	private String[] status;

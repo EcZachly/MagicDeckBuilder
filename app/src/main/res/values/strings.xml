@@ -51,7 +51,6 @@
     <string name="filter_by_type">Filter by Type</string>
     <string name="filter_by_tournament">Filter by Tournament</string>
 
-
     <string-array name="operating_systems">
         <item>Home</item>
         <item>Life Counter</item>
@@ -60,7 +59,7 @@
         <item>My Decks</item>
         <item>My Cart</item>
         <item>Advanced Search</item>
-        <item></item>
+        <item>Discovery Fragment</item>
         <item/>
         <item/>
         <item/>
@@ -86,5 +85,6 @@
     <string name="LIFE">LIFE</string>
     <string name="POISON">POISON</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_search">Search</string>
 
 </resources>

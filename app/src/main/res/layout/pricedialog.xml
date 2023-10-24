@@ -9,12 +9,15 @@
         android:layout_height="wrap_content" >
 
         <TextView
+            android:textColor="@android:color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/high_price" />
 
         <TextView
             android:id="@+id/highPrice"
+            android:textColor="@android:color/black"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
            android:text="@string/zeroes" />
@@ -25,11 +28,15 @@
         android:layout_height="wrap_content" >
 
         <TextView
+            android:textColor="@android:color/black"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/mean_price" />
 
         <TextView
+            android:textColor="@android:color/black"
+
             android:id="@+id/meanPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,11 +48,15 @@
         android:layout_height="wrap_content" >
 
         <TextView
+            android:textColor="@android:color/black"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/low_price" />
 
         <TextView
+            android:textColor="@android:color/black"
+
             android:id="@+id/lowPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,12 +68,15 @@
         android:layout_height="wrap_content" >
 
         <TextView
+            android:textColor="@android:color/black"
             android:id="@+id/foilPriceWords"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Avg Foil Price" />
 
         <TextView
+            android:textColor="@android:color/black"
+
             android:id="@+id/foilPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

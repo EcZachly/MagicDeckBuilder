@@ -9,10 +9,17 @@ android {
         versionCode 26
         versionName "6.5"
     }
+
+packagingOptions {
+    exclude 'META-INF/LICENSE.txt'
+}
+
+
+
     signingConfigs {
         release {
             // We can leave these in environment variables
-                storeFile file("C:\\Users\\Zach\\Desktop\\MagicAppKeystore\\MagicApp.apk")
+                //storeFile file("C:\\Users\\Zach\\Desktop\\MagicAppKeystore\\MagicApp.apk")
             keyAlias "magic app"
 
             // These two lines make gradle believe that the signingConfigs

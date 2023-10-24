@@ -12,6 +12,7 @@ import android.app.ProgressDialog;
 
 import android.content.Context;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.graphics.Bitmap;
@@ -19,6 +20,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import android.view.View;
@@ -38,12 +40,15 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.zach.wilson.magic.app.ItemDetailActivity;
 import com.zach.wilson.magic.app.R.drawable;
 import com.zach.wilson.magic.app.R.id;
 import com.zach.wilson.magic.app.R.layout;
 
 
-
+import com.zach.wilson.magic.app.models.Card;
+import com.zach.wilson.magic.app.models.Deck;
+import com.zach.wilson.magic.app.models.Edition;
 import com.zach.wilson.magic.app.models.Price;
 
 public class MyDeckFragment extends Fragment {
@@ -134,7 +139,12 @@ public class MyDeckFragment extends Fragment {
 
 			@Override
 			public void onItemClick(AdapterView<?> a, View v, int x, long l) {
-				String z;
+				Deck d = new Deck();
+
+                d.setName(deckNames.get(x));
+
+
+                String z;
 				selectedDeckName = deckNames.get(x);
 				z = deckNames.get(x);
 				cardNames = new ArrayList<String>();
@@ -152,6 +162,8 @@ public class MyDeckFragment extends Fragment {
 							}
 						}
 						hs.addAll(cardsInDeck);
+
+
 						cardNamesToShow = new ArrayList<String>();
 						cardsInDeckToShare = new ArrayList<String>();
 						for (Object s : hs) {
@@ -164,15 +176,30 @@ public class MyDeckFragment extends Fragment {
 							cardNamesToShow.add(temp.substring(0,
 									temp.indexOf("(+)")));
 						}		
-						
-						Fragment f =  new DeckListFragment();
-						Bundle args = new Bundle();
-						args.putString("DECK NAME", z);
-						args.putStringArrayList("CARD NAMES", cardsInDeckToShare);
-						args.putStringArrayList("CARD URLS", cardURLs);
-						args.putStringArrayList("CARD NAMES ALSO", cardNamesToShow);
-						f.setArguments(args);
-						getFragmentManager().beginTransaction().replace(id.content_frame, f).commit();
+
+                        Card[] temp = new Card[cardNamesToShow.size()];
+                        Card c;
+                        for(int w = 0; w <temp.length;w++){
+                            c = new Card();
+                                Log.i("CARD TO SHARE", cardsInDeckToShare.get(w));
+                            c.setName(cardsInDeckToShare.get(w));
+
+
+                            Edition[] temp1 = new Edition[1];
+                            temp1[0] = new Edition();
+                            temp1[0].setImage_url(cardURLs.get(w));
+                            c.setEditions(temp1);
+                            temp[w] = c;
+                            w++;
+                        }
+                        d.setMainBoard(temp);
+
+
+						Intent t = new Intent(context, ItemDetailActivity.class);
+                        t.putExtra("DECK", d);
+                        t.putExtra("CARDNAMES", cardsInDeckToShare);
+                        t.putExtra("FROMMYDECKS", true);
+                         startActivity(t);
 			}
 
 		});
